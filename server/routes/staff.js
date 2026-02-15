@@ -74,13 +74,21 @@ router.post(
 router.put('/:id', requireRole('admin'), async (req, res) => {
   try {
     const staffId = req.params.id;
-    const { fullName, phone, monthlySalary, commissionType, commissionValue, is_active } = req.body;
+    const { fullName, phone, role, password, monthlySalary, commissionType, commissionValue, is_active } = req.body;
     const [st] = await pool.query('SELECT user_id FROM staff WHERE id = ?', [staffId]);
     if (!st.length) return res.status(404).json({ error: 'Staff not found' });
     const userId = st[0].user_id;
     if (fullName !== undefined) await pool.query('UPDATE users SET full_name = ? WHERE id = ?', [fullName, userId]);
     if (phone !== undefined) await pool.query('UPDATE users SET phone = ? WHERE id = ?', [phone, userId]);
+    if (role !== undefined) {
+      if (!['admin', 'receptionist', 'staff'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+      await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, userId]);
+    }
     if (is_active !== undefined) await pool.query('UPDATE users SET is_active = ? WHERE id = ?', [is_active ? 1 : 0, userId]);
+    if (password && String(password).length >= 6) {
+      const hash = await bcrypt.hash(password, 10);
+      await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [hash, userId]);
+    }
     const supdates = [];
     const sparams = [];
     if (monthlySalary !== undefined) { supdates.push('monthly_salary = ?'); sparams.push(monthlySalary); }

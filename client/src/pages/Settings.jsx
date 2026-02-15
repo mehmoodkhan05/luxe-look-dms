@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, Form, Tab, Tabs, Button } from 'react-bootstrap';
+import { Card, Form, Tab, Tabs, Button, Table, Modal, Badge, Spinner } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function Settings() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAdmin } = useAuth();
   const { sidebarColor, navbarColor, setSidebarColor, setNavbarColor, resetSidebarColor, resetNavbarColor } = useTheme();
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [saving, setSaving] = useState(false);
@@ -30,6 +30,76 @@ export default function Settings() {
       toast.error(err.response?.data?.error || 'Failed to update');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const [staffList, setStaffList] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staffModal, setStaffModal] = useState(false);
+  const [viewModal, setViewModal] = useState(false);
+  const [viewingStaff, setViewingStaff] = useState(null);
+  const [editingStaff, setEditingStaff] = useState(null);
+  const [staffForm, setStaffForm] = useState({
+    fullName: '', phone: '', role: 'staff', is_active: true,
+    monthlySalary: 0, commissionType: 'percentage', commissionValue: 0, password: '',
+  });
+  const [staffSaving, setStaffSaving] = useState(false);
+
+  const loadStaff = () => {
+    setStaffLoading(true);
+    return api.get('/staff').then((r) => setStaffList(r.data)).finally(() => setStaffLoading(false));
+  };
+
+  useEffect(() => {
+    if (isAdmin) loadStaff();
+  }, [isAdmin]);
+
+  const openStaffView = (s) => {
+    setViewingStaff(s);
+    setViewModal(true);
+  };
+
+  const openStaffEdit = (s) => {
+    setEditingStaff(s);
+    setStaffForm({
+      fullName: s.full_name,
+      phone: s.phone || '',
+      role: s.role || 'staff',
+      is_active: s.is_active !== 0,
+      monthlySalary: s.monthly_salary ?? 0,
+      commissionType: s.commission_type || 'percentage',
+      commissionValue: s.commission_value ?? 0,
+      password: '',
+    });
+    setStaffModal(true);
+  };
+
+  const handleStaffSave = async (e) => {
+    e.preventDefault();
+    if (!staffForm.fullName?.trim()) {
+      toast.error('Full name is required');
+      return;
+    }
+    setStaffSaving(true);
+    try {
+      await api.put(`/staff/${editingStaff.id}`, {
+        fullName: staffForm.fullName.trim(),
+        phone: staffForm.phone || null,
+        role: staffForm.role,
+        is_active: staffForm.is_active,
+        monthlySalary: Number(staffForm.monthlySalary) || 0,
+        commissionType: staffForm.commissionType,
+        commissionValue: Number(staffForm.commissionValue) || 0,
+        ...(staffForm.password ? { password: staffForm.password } : {}),
+      });
+      toast.success('Staff account updated');
+      setStaffModal(false);
+      setEditingStaff(null);
+      loadStaff();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update');
+    } finally {
+      setStaffSaving(false);
     }
   };
 
@@ -67,6 +137,52 @@ export default function Settings() {
             </Card.Body>
           </Card>
         </Tab>
+        {isAdmin && (
+          <Tab eventKey="staff-accounts" title="Staff Accounts">
+            <Card>
+              <Card.Body>
+                {staffLoading ? (
+                  <div className="text-center py-4"><Spinner className="text-warning" /></div>
+                ) : (
+                  <Table responsive hover>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {staffList.map((s) => (
+                        <tr key={s.id}>
+                          <td>{s.full_name}</td>
+                          <td>{s.email}</td>
+                          <td>{s.phone || '—'}</td>
+                          <td><Badge bg="secondary">{s.role}</Badge></td>
+                          <td><Badge bg={s.is_active ? 'success' : 'danger'}>{s.is_active ? 'Active' : 'Inactive'}</Badge></td>
+                          <td className="text-nowrap">
+                            <Button variant="outline-primary" size="sm" className="me-1 fw-semibold" style={{ borderRadius: '10px' }} onClick={() => openStaffView(s)} title="View">
+                              <i className="fas fa-eye" />
+                            </Button>
+                            <Button variant="outline-luxe" size="sm" onClick={() => openStaffEdit(s)} title="Edit">
+                              <i className="fas fa-pen" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+                {!staffLoading && staffList.length === 0 && (
+                  <p className="text-muted text-center py-4 mb-0">No staff accounts. Add staff from the Staff page.</p>
+                )}
+              </Card.Body>
+            </Card>
+          </Tab>
+        )}
         <Tab eventKey="appearance" title="Appearance">
           <Card>
             <Card.Body>
@@ -162,6 +278,98 @@ export default function Settings() {
           </Card>
         </Tab>
       </Tabs>
+
+      <Modal show={viewModal} onHide={() => { setViewModal(false); setViewingStaff(null); }} centered>
+        <Modal.Header closeButton><Modal.Title>Staff Details</Modal.Title></Modal.Header>
+        <Modal.Body>
+          {viewingStaff && (
+            <dl className="mb-0 row">
+              <dt className="col-sm-4 text-muted">Name</dt>
+              <dd className="col-sm-8">{viewingStaff.full_name}</dd>
+              <dt className="col-sm-4 text-muted">Email</dt>
+              <dd className="col-sm-8">{viewingStaff.email}</dd>
+              <dt className="col-sm-4 text-muted">Phone</dt>
+              <dd className="col-sm-8">{viewingStaff.phone || '—'}</dd>
+              <dt className="col-sm-4 text-muted">Role</dt>
+              <dd className="col-sm-8"><Badge bg="secondary">{viewingStaff.role}</Badge></dd>
+              <dt className="col-sm-4 text-muted">Status</dt>
+              <dd className="col-sm-8"><Badge bg={viewingStaff.is_active ? 'success' : 'danger'}>{viewingStaff.is_active ? 'Active' : 'Inactive'}</Badge></dd>
+              <dt className="col-sm-4 text-muted">Monthly Salary</dt>
+              <dd className="col-sm-8">{viewingStaff.monthly_salary != null ? `PKR ${Number(viewingStaff.monthly_salary).toLocaleString()}` : '—'}</dd>
+              <dt className="col-sm-4 text-muted">Commission</dt>
+              <dd className="col-sm-8">
+                {viewingStaff.commission_type === 'percentage'
+                  ? `${viewingStaff.commission_value}%`
+                  : viewingStaff.commission_type === 'fixed'
+                    ? `PKR ${viewingStaff.commission_value} per service`
+                    : '—'}
+              </dd>
+            </dl>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => { setViewModal(false); setViewingStaff(null); }}>Close</Button>
+          <Button className="btn-luxe" onClick={() => { setViewModal(false); openStaffEdit(viewingStaff); setViewingStaff(null); }}>
+            <i className="fas fa-pen me-1" />Edit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={staffModal} onHide={() => { setStaffModal(false); setEditingStaff(null); }} centered backdrop="static">
+        <Modal.Header closeButton><Modal.Title>Edit Staff Account</Modal.Title></Modal.Header>
+        <Form onSubmit={handleStaffSave}>
+          <Modal.Body>
+            <Form.Group className="mb-2">
+              <Form.Label>Full Name</Form.Label>
+              <Form.Control value={staffForm.fullName} onChange={(e) => setStaffForm((f) => ({ ...f, fullName: e.target.value }))} required />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Email</Form.Label>
+              <Form.Control value={editingStaff?.email || ''} readOnly disabled className="bg-secondary bg-opacity-25" />
+              <Form.Text className="text-muted">Email cannot be changed</Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Phone</Form.Label>
+              <Form.Control value={staffForm.phone} onChange={(e) => setStaffForm((f) => ({ ...f, phone: e.target.value }))} placeholder="Phone" />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Role</Form.Label>
+              <Form.Select value={staffForm.role} onChange={(e) => setStaffForm((f) => ({ ...f, role: e.target.value }))}>
+                <option value="staff">Staff</option>
+                <option value="receptionist">Receptionist</option>
+                <option value="admin">Admin</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Monthly Salary (PKR)</Form.Label>
+              <Form.Control type="number" min={0} value={staffForm.monthlySalary} onChange={(e) => setStaffForm((f) => ({ ...f, monthlySalary: e.target.value }))} />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Commission Type</Form.Label>
+              <Form.Select value={staffForm.commissionType} onChange={(e) => setStaffForm((f) => ({ ...f, commissionType: e.target.value }))}>
+                <option value="percentage">Percentage</option>
+                <option value="fixed">Fixed per service</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>{staffForm.commissionType === 'percentage' ? 'Commission %' : 'Commission (PKR) per service'}</Form.Label>
+              <Form.Control type="number" min={0} step={0.01} value={staffForm.commissionValue} onChange={(e) => setStaffForm((f) => ({ ...f, commissionValue: e.target.value }))} />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>New Password (optional)</Form.Label>
+              <Form.Control type="password" value={staffForm.password} onChange={(e) => setStaffForm((f) => ({ ...f, password: e.target.value }))} placeholder="Leave blank to keep current" minLength={6} />
+              <Form.Text className="text-muted">Min 6 characters</Form.Text>
+            </Form.Group>
+            <Form.Group>
+              <Form.Check type="switch" id="staff_active" label="Active" checked={staffForm.is_active} onChange={(e) => setStaffForm((f) => ({ ...f, is_active: e.target.checked }))} />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => { setStaffModal(false); setEditingStaff(null); }}>Cancel</Button>
+            <Button type="submit" className="btn-luxe" disabled={staffSaving}>{staffSaving ? 'Saving…' : 'Save'}</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </>
   );
 }

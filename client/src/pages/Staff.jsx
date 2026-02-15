@@ -39,6 +39,7 @@ export default function Staff() {
     setForm({
       fullName: s.full_name,
       email: s.email,
+      role: s.role || 'staff',
       phone: s.phone || '',
       monthlySalary: s.monthly_salary ?? 0,
       commissionType: s.commission_type || 'percentage',
@@ -58,6 +59,7 @@ export default function Staff() {
       try {
         await api.put(`/staff/${editing.id}`, {
           fullName: form.fullName,
+          role: form.role,
           phone: form.phone || null,
           monthlySalary: Number(form.monthlySalary) || 0,
           commissionType: form.commissionType,
@@ -172,21 +174,19 @@ export default function Staff() {
             />
           </Form.Group>
           {!editing && (
-            <>
-              <Form.Group className="mb-2">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Min 6 chars" />
-              </Form.Group>
-              <Form.Group className="mb-2">
-                <Form.Label>Role</Form.Label>
-                <Form.Select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}>
-                  <option value="staff">Staff</option>
-                  <option value="receptionist">Receptionist</option>
-                  <option value="admin">Admin</option>
-                </Form.Select>
-              </Form.Group>
-            </>
+            <Form.Group className="mb-2">
+              <Form.Label>Password</Form.Label>
+              <Form.Control type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Min 6 chars" />
+            </Form.Group>
           )}
+          <Form.Group className="mb-2">
+            <Form.Label>Role</Form.Label>
+            <Form.Select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}>
+              <option value="staff">Staff</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="admin">Admin</option>
+            </Form.Select>
+          </Form.Group>
           <Form.Group className="mb-2">
             <Form.Label>Phone</Form.Label>
             <Form.Control value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
