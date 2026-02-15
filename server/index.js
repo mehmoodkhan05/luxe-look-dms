@@ -10,6 +10,7 @@ import invoiceRoutes from './routes/invoices.js';
 import inventoryRoutes from './routes/inventory.js';
 import staffRoutes from './routes/staff.js';
 import payrollRoutes from './routes/payroll.js';
+import attendanceRoutes from './routes/attendance.js';
 import reportRoutes from './routes/reports.js';
 import expenseRoutes from './routes/expenses.js';
 import { seedAdmin } from './scripts/seed.js';
@@ -29,7 +30,7 @@ app.get('/api', (req, res) => {
   res.json({
     name: 'Luxe Look DMS API',
     version: '1.0',
-    endpoints: ['/api/health', '/api/auth', '/api/dashboard', '/api/customers', '/api/appointments', '/api/services', '/api/invoices', '/api/inventory', '/api/staff', '/api/payroll', '/api/reports', '/api/expenses'],
+    endpoints: ['/api/health', '/api/auth', '/api/dashboard', '/api/customers', '/api/appointments', '/api/services', '/api/invoices', '/api/inventory', '/api/staff', '/api/payroll', '/api/attendance', '/api/reports', '/api/expenses'],
   });
 });
 
@@ -42,6 +43,7 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/payroll', payrollRoutes);
+app.use('/api/attendance', attendanceRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/expenses', expenseRoutes);
 

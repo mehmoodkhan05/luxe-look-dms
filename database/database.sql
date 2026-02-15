@@ -159,6 +159,8 @@ CREATE TABLE attendance (
   date DATE NOT NULL,
   status ENUM('present', 'absent', 'leave', 'half_day') DEFAULT 'present',
   notes TEXT,
+  half_day_from TIME NULL COMMENT 'From time when status is half_day',
+  half_day_to TIME NULL COMMENT 'To time when status is half_day',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY (staff_id, date),
   FOREIGN KEY (staff_id) REFERENCES staff(id)
@@ -205,3 +207,7 @@ CREATE TABLE audit_logs (
 );
 
 -- Default admin is created by server seed on first run (admin@luxelook.com / admin123)
+
+-- Migration: add half-day times to existing attendance table (run if table already exists)
+-- ALTER TABLE attendance ADD COLUMN half_day_from TIME NULL AFTER notes;
+-- ALTER TABLE attendance ADD COLUMN half_day_to TIME NULL AFTER half_day_from;

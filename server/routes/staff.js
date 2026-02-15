@@ -56,10 +56,11 @@ router.post(
       );
       const userId = userResult.insertId;
       let staffId = null;
-      if (role === 'staff') {
+      // Staff and receptionist both get a staff row so they appear in attendance and staff list
+      if (role === 'staff' || role === 'receptionist') {
         const [stResult] = await pool.query(
           'INSERT INTO staff (user_id, monthly_salary, commission_type, commission_value, join_date) VALUES (?, ?, ?, ?, ?)',
-          [userId, monthlySalary || 0, commissionType || 'percentage', commissionValue || 0, new Date()]
+          [userId, role === 'staff' ? (monthlySalary || 0) : 0, role === 'staff' ? (commissionType || 'percentage') : 'percentage', role === 'staff' ? (commissionValue || 0) : 0, new Date()]
         );
         staffId = stResult.insertId;
       }

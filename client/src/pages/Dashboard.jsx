@@ -11,21 +11,25 @@ export default function Dashboard() {
   const [weekly, setWeekly] = useState([]);
   const [serviceTrend, setServiceTrend] = useState([]);
   const [topStaff, setTopStaff] = useState([]);
+  const [todayAttendance, setTodayAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const [o, w, s, t] = await Promise.all([
+        const today = format(new Date(), 'yyyy-MM-dd');
+        const [o, w, s, t, att] = await Promise.all([
           api.get('/dashboard/overview'),
           api.get('/dashboard/weekly-revenue'),
           api.get('/dashboard/monthly-service-trend'),
           api.get('/dashboard/top-staff'),
+          api.get('/attendance', { params: { date: today } }).catch(() => ({ data: [] })),
         ]);
         setOverview(o.data);
         setWeekly(w.data);
         setServiceTrend(s.data);
         setTopStaff(t.data);
+        setTodayAttendance(Array.isArray(att.data) ? att.data : []);
       } catch (e) {
         console.error('Dashboard API error:', e.response?.data || e.message);
         setOverview({ todayAppointments: 0, completedToday: 0, cancelledToday: 0, todayRevenue: 0, monthlyRevenue: 0, lowStockAlerts: [], staffPresentToday: 0 });
@@ -104,7 +108,7 @@ export default function Dashboard() {
           </Card>
         </Col>
         <Col lg={4}>
-          <Card>
+          <Card className="mb-4">
             <Card.Header>Top Performing Staff</Card.Header>
             <Card.Body>
               {topStaff.length === 0 ? (
@@ -116,6 +120,25 @@ export default function Dashboard() {
                       <span className="text-luxe-gold fw-bold">{i + 1}.</span>
                       <span>{s.full_name}</span>
                       <span className="text-luxe-gold">PKR {Number(s.revenue).toLocaleString()}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card.Body>
+          </Card>
+          <Card>
+            <Card.Header>Today&apos;s Attendance</Card.Header>
+            <Card.Body>
+              {todayAttendance.length === 0 ? (
+                <p className="text-muted small mb-0">No attendance recorded for today</p>
+              ) : (
+                <ul className="list-unstyled mb-0">
+                  {todayAttendance.map((a) => (
+                    <li key={a.staff_id} className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
+                      <span>{a.full_name}</span>
+                      <Badge bg={a.status === 'present' ? 'success' : a.status === 'absent' ? 'danger' : a.status === 'leave' ? 'warning' : 'info'} text={a.status === 'leave' ? 'dark' : undefined}>
+                        {a.status ? a.status.replace('_', ' ') : '—'}
+                      </Badge>
                     </li>
                   ))}
                 </ul>

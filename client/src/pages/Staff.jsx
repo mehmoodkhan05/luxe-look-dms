@@ -165,9 +165,10 @@ export default function Staff() {
             <Form.Control
               type="email"
               value={form.email}
-              readOnly
-              disabled
-              title="Email cannot be changed"
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              readOnly={!!editing}
+              disabled={!!editing}
+              title={editing ? 'Email cannot be changed' : undefined}
             />
           </Form.Group>
           {!editing && (

@@ -398,6 +398,53 @@ select option {
   font-size: 1.1rem;
 }
 
+.sidebar-collapse-wrapper {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-collapse-trigger {
+  color: var(--luxe-sidebar-text) !important;
+  background: transparent !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-collapse-trigger:hover {
+  background: rgba(201, 169, 98, 0.12) !important;
+  color: var(--luxe-gold) !important;
+}
+
+.sidebar-collapse-caret {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  line-height: 1;
+}
+
+.sidebar-collapse-trigger .sidebar-collapse-caret {
+  transform: rotate(0deg);
+}
+
+.sidebar-collapse-trigger.open .sidebar-collapse-caret {
+  transform: rotate(90deg);
+}
+
+.sidebar-collapse-content {
+  padding-left: 1rem;
+  padding-top: 0.15rem;
+  padding-bottom: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sidebar-sublink {
+  font-size: 0.95rem;
+}
+
 .sidebar-bottom {
   margin-top: auto;
   display: flex;
