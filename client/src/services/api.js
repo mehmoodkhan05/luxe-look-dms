@@ -19,7 +19,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('lldms_token');
       localStorage.removeItem('lldms_user');
-      window.location.href = '/login';
+      window.location.href = '/luxelook/login';
     }
     return Promise.reject(err);
   }

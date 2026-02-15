@@ -258,8 +258,9 @@ p, span, li, div, h1, h2, h3, h4, h5, h6 {
 
 .btn-outline-success { border: 2px solid var(--luxe-success); color: var(--luxe-success) !important; }
 .btn-outline-success:hover { background: rgba(74, 222, 128, 0.15); color: var(--luxe-success) !important; border-color: var(--luxe-success); }
-.btn-outline-danger { border: 2px solid var(--luxe-danger); color: var(--luxe-danger) !important; }
+.btn-outline-danger { border: 2px solid var(--luxe-danger); color: var(--luxe-danger) !important; border-radius: 10px; }
 .btn-outline-danger:hover { background: rgba(248, 113, 113, 0.15); color: var(--luxe-danger) !important; border-color: var(--luxe-danger); }
+.btn-outline-primary { border-radius: 10px; }
 .btn-outline-info { border: 2px solid var(--luxe-info); color: var(--luxe-info) !important; }
 .btn-outline-info:hover { background: rgba(125, 211, 252, 0.15); color: var(--luxe-info) !important; border-color: var(--luxe-info); }
 

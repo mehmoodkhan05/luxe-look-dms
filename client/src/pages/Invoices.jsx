@@ -156,7 +156,7 @@ export default function Invoices() {
                     <td>{inv.customer_name}</td>
                     <td>PKR {Number(inv.total_amount).toLocaleString()}</td>
                     <td><Badge bg={inv.payment_status === 'paid' ? 'success' : 'warning'}>{inv.payment_status}</Badge></td>
-                    <td><Button variant="outline-luxe" size="sm" onClick={() => viewDetail(inv.id)} title="View"><i className="fas fa-eye" /></Button></td>
+                    <td><Button variant="outline-primary" size="sm" onClick={() => viewDetail(inv.id)} title="View"><i className="fas fa-eye" /></Button></td>
                   </tr>
                 ))}
               </tbody>
