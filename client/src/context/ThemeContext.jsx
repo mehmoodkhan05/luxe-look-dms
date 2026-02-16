@@ -35,7 +35,7 @@ function clampRgb(v) {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'dark');
+  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'light');
   const [sidebarColor, setSidebarColorState] = useState(() => parseStoredColor(SIDEBAR_COLOR_KEY, DEFAULT_SIDEBAR));
   const [navbarColor, setNavbarColorState] = useState(() => parseStoredColor(NAVBAR_COLOR_KEY, DEFAULT_NAVBAR));
 
