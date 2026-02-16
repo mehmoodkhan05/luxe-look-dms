@@ -51,9 +51,9 @@ export default function Layout() {
       {/* Top navbar */}
       <Navbar expand="md" className="luxe-navbar border-bottom border-secondary">
         <Container fluid className="px-3 px-md-4">
-          <Navbar.Brand as={NavLink} to="/" className="navbar-brand-luxe d-flex align-items-center gap-2 text-luxe-gold fw-bold">
-            <span className="fs-4">✨</span>
-            <span className="d-none d-sm-inline">Luxe Look</span>
+          <Navbar.Brand as={NavLink} to="/" className="navbar-brand-luxe d-flex align-items-center gap-2 fw-bold">
+            <img src={`${import.meta.env.BASE_URL}logobg.jpg`} alt="Luxe Look Parlour" className="luxe-logo-nav" decoding="async" fetchPriority="high" />
+            <span className="d-none d-sm-inline text-luxe-gold">Luxe Look</span>
           </Navbar.Brand>
           <div className="d-flex align-items-center gap-2 gap-md-3">
             <Button

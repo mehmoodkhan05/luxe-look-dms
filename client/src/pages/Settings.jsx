@@ -4,12 +4,53 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import TablePagination, { paginate, useTablePagination } from '../components/TablePagination';
 
 export default function Settings() {
   const { user, updateUser, isAdmin } = useAuth();
   const { sidebarColor, navbarColor, setSidebarColor, setNavbarColor, resetSidebarColor, resetNavbarColor } = useTheme();
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [saving, setSaving] = useState(false);
+
+  const rgbToHex = (r, g, b) => '#' + [r, g, b].map((x) => {
+    const h = Math.max(0, Math.min(255, Math.round(Number(x) || 0)).toString(16));
+    return h.length === 1 ? '0' + h : h;
+  }).join('');
+  const hexToRgb = (hex) => {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : null;
+  };
+
+  const [sidebarInput, setSidebarInput] = useState({ r: String(sidebarColor.r), g: String(sidebarColor.g), b: String(sidebarColor.b) });
+  const [navbarInput, setNavbarInput] = useState({ r: String(navbarColor.r), g: String(navbarColor.g), b: String(navbarColor.b) });
+  useEffect(() => {
+    setSidebarInput({ r: String(sidebarColor.r), g: String(sidebarColor.g), b: String(sidebarColor.b) });
+  }, [sidebarColor.r, sidebarColor.g, sidebarColor.b]);
+  useEffect(() => {
+    setNavbarInput({ r: String(navbarColor.r), g: String(navbarColor.g), b: String(navbarColor.b) });
+  }, [navbarColor.r, navbarColor.g, navbarColor.b]);
+
+  const clamp = (v) => Math.min(255, Math.max(0, parseInt(String(v), 10) || 0));
+  const handleSidebarChannel = (channel, raw) => {
+    setSidebarInput((prev) => ({ ...prev, [channel]: raw }));
+    const num = parseInt(raw, 10);
+    if (raw !== '' && !Number.isNaN(num)) setSidebarColor({ ...sidebarColor, [channel]: clamp(raw) });
+  };
+  const handleSidebarBlur = (channel) => {
+    const val = clamp(sidebarInput[channel]);
+    setSidebarInput((prev) => ({ ...prev, [channel]: String(val) }));
+    setSidebarColor({ ...sidebarColor, [channel]: val });
+  };
+  const handleNavbarChannel = (channel, raw) => {
+    setNavbarInput((prev) => ({ ...prev, [channel]: raw }));
+    const num = parseInt(raw, 10);
+    if (raw !== '' && !Number.isNaN(num)) setNavbarColor({ ...navbarColor, [channel]: clamp(raw) });
+  };
+  const handleNavbarBlur = (channel) => {
+    const val = clamp(navbarInput[channel]);
+    setNavbarInput((prev) => ({ ...prev, [channel]: String(val) }));
+    setNavbarColor({ ...navbarColor, [channel]: val });
+  };
 
   useEffect(() => {
     setFullName(user?.fullName || '');
@@ -35,6 +76,8 @@ export default function Settings() {
 
   const [staffList, setStaffList] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
+  const [staffPage, setStaffPage] = useState(1);
+  const { totalPages: staffTotalPages } = useTablePagination(staffList.length);
   const [staffModal, setStaffModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [viewingStaff, setViewingStaff] = useState(null);
@@ -144,37 +187,40 @@ export default function Settings() {
                 {staffLoading ? (
                   <div className="text-center py-4"><Spinner className="text-warning" /></div>
                 ) : (
-                  <Table responsive hover>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {staffList.map((s) => (
-                        <tr key={s.id}>
-                          <td>{s.full_name}</td>
-                          <td>{s.email}</td>
-                          <td>{s.phone || '—'}</td>
-                          <td><Badge bg="secondary">{s.role}</Badge></td>
-                          <td><Badge bg={s.is_active ? 'success' : 'danger'}>{s.is_active ? 'Active' : 'Inactive'}</Badge></td>
-                          <td className="text-nowrap">
-                            <Button variant="outline-primary" size="sm" className="me-1 fw-semibold" style={{ borderRadius: '10px' }} onClick={() => openStaffView(s)} title="View">
-                              <i className="fas fa-eye" />
-                            </Button>
-                            <Button variant="outline-luxe" size="sm" onClick={() => openStaffEdit(s)} title="Edit">
-                              <i className="fas fa-pen" />
-                            </Button>
-                          </td>
+                  <>
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Role</th>
+                          <th>Status</th>
+                          <th></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                      </thead>
+                      <tbody>
+                        {paginate(staffList, staffPage).map((s) => (
+                          <tr key={s.id}>
+                            <td>{s.full_name}</td>
+                            <td>{s.email}</td>
+                            <td>{s.phone || '—'}</td>
+                            <td><Badge bg="secondary">{s.role}</Badge></td>
+                            <td><Badge bg={s.is_active ? 'success' : 'danger'}>{s.is_active ? 'Active' : 'Inactive'}</Badge></td>
+                            <td className="text-nowrap">
+                              <Button variant="outline-primary" size="sm" className="me-1 fw-semibold" style={{ borderRadius: '10px' }} onClick={() => openStaffView(s)} title="View">
+                                <i className="fas fa-eye" />
+                              </Button>
+                              <Button variant="outline-luxe" size="sm" onClick={() => openStaffEdit(s)} title="Edit">
+                                <i className="fas fa-pen" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                    <TablePagination currentPage={staffPage} totalPages={staffTotalPages} onPageChange={setStaffPage} />
+                  </>
                 )}
                 {!staffLoading && staffList.length === 0 && (
                   <p className="text-muted text-center py-4 mb-0">No staff accounts. Add staff from the Staff page.</p>
@@ -187,36 +233,56 @@ export default function Settings() {
           <Card>
             <Card.Body>
               <h6 className="mb-3">Sidebar & Navbar Colors</h6>
-              <Form.Text className="d-block mb-3 text-muted">RGB values (170–255) for light colors</Form.Text>
+              <Form.Text className="d-block mb-3 text-muted">RGB values (0–255). Use the color bar to pick any color, or enter numbers.</Form.Text>
 
               <Form.Group className="mb-3">
                 <Form.Label>Sidebar color</Form.Label>
                 <div className="d-flex flex-wrap gap-2 align-items-center">
+                  <input
+                    type="color"
+                    aria-label="Sidebar color picker"
+                    value={rgbToHex(sidebarColor.r, sidebarColor.g, sidebarColor.b)}
+                    onChange={(e) => {
+                      const rgb = hexToRgb(e.target.value);
+                      if (rgb) setSidebarColor(rgb);
+                    }}
+                    className="settings-color-picker"
+                    style={{ width: 44, height: 38, padding: 2, border: '1px solid var(--luxe-border)', cursor: 'pointer' }}
+                  />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="R"
-                    value={sidebarColor.r}
-                    onChange={(e) => setSidebarColor({ ...sidebarColor, r: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={sidebarInput.r}
+                    onChange={(e) => handleSidebarChannel('r', e.target.value)}
+                    onBlur={() => handleSidebarBlur('r')}
+                    onInput={(e) => handleSidebarChannel('r', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="G"
-                    value={sidebarColor.g}
-                    onChange={(e) => setSidebarColor({ ...sidebarColor, g: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={sidebarInput.g}
+                    onChange={(e) => handleSidebarChannel('g', e.target.value)}
+                    onBlur={() => handleSidebarBlur('g')}
+                    onInput={(e) => handleSidebarChannel('g', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="B"
-                    value={sidebarColor.b}
-                    onChange={(e) => setSidebarColor({ ...sidebarColor, b: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={sidebarInput.b}
+                    onChange={(e) => handleSidebarChannel('b', e.target.value)}
+                    onBlur={() => handleSidebarBlur('b')}
+                    onInput={(e) => handleSidebarChannel('b', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <div
@@ -227,6 +293,7 @@ export default function Settings() {
                       background: `rgb(${sidebarColor.r}, ${sidebarColor.g}, ${sidebarColor.b})`,
                       border: '1px solid var(--luxe-border)',
                     }}
+                    aria-hidden
                   />
                   <Button variant="outline-secondary" size="sm" onClick={resetSidebarColor}>Reset</Button>
                 </div>
@@ -235,31 +302,51 @@ export default function Settings() {
               <Form.Group className="mb-3">
                 <Form.Label>Navbar color</Form.Label>
                 <div className="d-flex flex-wrap gap-2 align-items-center">
+                  <input
+                    type="color"
+                    aria-label="Navbar color picker"
+                    value={rgbToHex(navbarColor.r, navbarColor.g, navbarColor.b)}
+                    onChange={(e) => {
+                      const rgb = hexToRgb(e.target.value);
+                      if (rgb) setNavbarColor(rgb);
+                    }}
+                    className="settings-color-picker"
+                    style={{ width: 44, height: 38, padding: 2, border: '1px solid var(--luxe-border)', cursor: 'pointer' }}
+                  />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="R"
-                    value={navbarColor.r}
-                    onChange={(e) => setNavbarColor({ ...navbarColor, r: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={navbarInput.r}
+                    onChange={(e) => handleNavbarChannel('r', e.target.value)}
+                    onBlur={() => handleNavbarBlur('r')}
+                    onInput={(e) => handleNavbarChannel('r', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="G"
-                    value={navbarColor.g}
-                    onChange={(e) => setNavbarColor({ ...navbarColor, g: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={navbarInput.g}
+                    onChange={(e) => handleNavbarChannel('g', e.target.value)}
+                    onBlur={() => handleNavbarBlur('g')}
+                    onInput={(e) => handleNavbarChannel('g', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <Form.Control
                     type="number"
-                    min={170}
+                    min={0}
                     max={255}
                     placeholder="B"
-                    value={navbarColor.b}
-                    onChange={(e) => setNavbarColor({ ...navbarColor, b: Math.min(255, Math.max(170, +e.target.value || 170)) })}
+                    value={navbarInput.b}
+                    onChange={(e) => handleNavbarChannel('b', e.target.value)}
+                    onBlur={() => handleNavbarBlur('b')}
+                    onInput={(e) => handleNavbarChannel('b', e.target.value)}
+                    inputMode="numeric"
                     style={{ width: '70px' }}
                   />
                   <div
@@ -270,6 +357,7 @@ export default function Settings() {
                       background: `rgb(${navbarColor.r}, ${navbarColor.g}, ${navbarColor.b})`,
                       border: '1px solid var(--luxe-border)',
                     }}
+                    aria-hidden
                   />
                   <Button variant="outline-secondary" size="sm" onClick={resetNavbarColor}>Reset</Button>
                 </div>

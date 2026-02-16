@@ -97,7 +97,7 @@ export default function Dashboard() {
             <Card.Header>Weekly Revenue</Card.Header>
             <Card.Body>
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={weekData}>
+                <LineChart data={weekData} margin={{ top: 16, right: 10, bottom: 5, left: 5 }}>
                   <XAxis dataKey="label" stroke="#8a8580" />
                   <YAxis stroke="#8a8580" tickFormatter={(v) => `PKR ${v}`} />
                   <Tooltip contentStyle={{ background: '#1a1a24', border: '1px solid #2d2d3a' }} formatter={(v) => [`PKR ${v}`, 'Revenue']} />

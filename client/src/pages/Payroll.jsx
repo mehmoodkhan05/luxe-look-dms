@@ -85,7 +85,11 @@ export default function Payroll() {
                     <td>PKR {Number(p.commission_earned).toLocaleString()}</td>
                     <td>PKR {Number(p.deductions).toLocaleString()}</td>
                     <td className="fw-bold text-luxe-gold">PKR {Number(p.net_payable).toLocaleString()}</td>
-                    <td><span className="badge bg-secondary">{p.status}</span></td>
+                    <td>
+                      <span className={`badge ${p.status === 'draft' ? 'bg-warning text-dark' : p.status === 'paid' ? 'bg-success' : 'bg-secondary'}`}>
+                        {p.status}
+                      </span>
+                    </td>
                     <td>
                       {p.status === 'draft' && (
                         <>

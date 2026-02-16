@@ -83,7 +83,7 @@ export default function Reports() {
             <Card.Header>Weekly Revenue Trend</Card.Header>
             <Card.Body>
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={weekly.map((d) => ({ ...d, label: format(new Date(d.date), 'EEE') }))}>
+                <BarChart data={weekly.map((d) => ({ ...d, label: format(new Date(d.date), 'EEE') }))} margin={{ top: 16, right: 10, bottom: 5, left: 5 }}>
                   <XAxis dataKey="label" stroke="#8a8580" />
                   <YAxis stroke="#8a8580" tickFormatter={(v) => `PKR ${v}`} />
                   <Tooltip contentStyle={{ background: '#1a1a24', border: '1px solid #2d2d3a' }} formatter={(v) => [`PKR ${v}`, 'Revenue']} />

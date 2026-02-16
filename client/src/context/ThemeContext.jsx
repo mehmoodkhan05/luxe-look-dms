@@ -13,7 +13,13 @@ function parseStoredColor(key, fallback) {
     const s = localStorage.getItem(key);
     if (!s) return fallback;
     const obj = JSON.parse(s);
-    if (obj?.r != null && obj?.g != null && obj?.b != null) return obj;
+    if (obj?.r != null && obj?.g != null && obj?.b != null) {
+      return {
+        r: clampRgb(obj.r),
+        g: clampRgb(obj.g),
+        b: clampRgb(obj.b),
+      };
+    }
   } catch {}
   return fallback;
 }
@@ -22,8 +28,10 @@ function rgbToCss({ r, g, b }) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function clampLight(v) {
-  return Math.min(255, Math.max(170, Number(v) || 170));
+function clampRgb(v) {
+  const n = Number(v);
+  if (n !== n) return 255;
+  return Math.min(255, Math.max(0, n));
 }
 
 export function ThemeProvider({ children }) {
@@ -47,17 +55,17 @@ export function ThemeProvider({ children }) {
 
   const setSidebarColor = (rgb) => {
     setSidebarColorState({
-      r: clampLight(rgb.r),
-      g: clampLight(rgb.g),
-      b: clampLight(rgb.b),
+      r: clampRgb(rgb.r),
+      g: clampRgb(rgb.g),
+      b: clampRgb(rgb.b),
     });
   };
 
   const setNavbarColor = (rgb) => {
     setNavbarColorState({
-      r: clampLight(rgb.r),
-      g: clampLight(rgb.g),
-      b: clampLight(rgb.b),
+      r: clampRgb(rgb.r),
+      g: clampRgb(rgb.g),
+      b: clampRgb(rgb.b),
     });
   };
 

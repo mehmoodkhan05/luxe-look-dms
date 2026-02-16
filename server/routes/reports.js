@@ -17,11 +17,16 @@ router.get('/daily', async (req, res) => {
       [date]
     );
     const [revenue] = await pool.query(
-      `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) = ? AND payment_status = 'paid'`,
+      `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE DATE(i.created_at) = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
       [date]
     );
     const [paymentBreakdown] = await pool.query(
-      `SELECT payment_method, SUM(total_amount) as total FROM invoices WHERE DATE(created_at) = ? AND payment_status = 'paid' GROUP BY payment_method`,
+      `SELECT i.payment_method, SUM(i.total_amount) as total FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE DATE(i.created_at) = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')
+       GROUP BY i.payment_method`,
       [date]
     );
     res.json({
@@ -43,7 +48,9 @@ router.get('/weekly', async (req, res) => {
       d.setDate(d.getDate() - i);
       const dateStr = formatDate(d);
       const [rev] = await pool.query(
-        `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) = ? AND payment_status = 'paid'`,
+        `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+         LEFT JOIN appointments a ON a.id = i.appointment_id
+         WHERE DATE(i.created_at) = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
         [dateStr]
       );
       const [apt] = await pool.query(
@@ -64,13 +71,18 @@ router.get('/monthly', requireRole('admin', 'receptionist'), async (req, res) =>
     const start = monthYear + '-01';
     const end = monthYear + '-31';
     const [revenue] = await pool.query(
-      `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) BETWEEN ? AND ? AND payment_status = 'paid'`,
+      `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE DATE(i.created_at) BETWEEN ? AND ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
       [start, end]
     );
     const [staffPerf] = await pool.query(
-      `SELECT u.full_name, COUNT(i.id) as invoices_count, COALESCE(SUM(i.total_amount), 0) as revenue
+      `SELECT u.full_name,
+         COUNT(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.id END) as invoices_count,
+         COALESCE(SUM(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.total_amount ELSE 0 END), 0) as revenue
        FROM staff st JOIN users u ON u.id = st.user_id
        LEFT JOIN invoices i ON i.staff_id = st.id AND i.payment_status = 'paid' AND DATE(i.created_at) BETWEEN ? AND ?
+       LEFT JOIN appointments a ON a.id = i.appointment_id
        GROUP BY st.id, u.full_name`,
       [start, end]
     );
@@ -92,9 +104,12 @@ router.get('/monthly', requireRole('admin', 'receptionist'), async (req, res) =>
 router.get('/staff-performance', requireRole('admin', 'receptionist'), async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT st.id, u.full_name, COUNT(i.id) as services_count, COALESCE(SUM(i.total_amount), 0) as revenue
+      `SELECT st.id, u.full_name,
+         COUNT(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.id END) as services_count,
+         COALESCE(SUM(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.total_amount ELSE 0 END), 0) as revenue
        FROM staff st JOIN users u ON u.id = st.user_id
        LEFT JOIN invoices i ON i.staff_id = st.id AND i.payment_status = 'paid'
+       LEFT JOIN appointments a ON a.id = i.appointment_id
        GROUP BY st.id, u.full_name ORDER BY revenue DESC`
     );
     res.json(rows.map(r => ({ ...r, revenue: Number(r.revenue) })));

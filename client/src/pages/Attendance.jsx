@@ -3,6 +3,7 @@ import { Card, Table, Button, Form, Spinner } from 'react-bootstrap';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import TablePagination, { paginate, useTablePagination } from '../components/TablePagination';
 
 const STATUS_OPTIONS = [
   { value: 'present', label: 'Present' },
@@ -18,6 +19,8 @@ export default function Attendance() {
   const [saving, setSaving] = useState(false);
   const [local, setLocal] = useState([]);
   const [loadError, setLoadError] = useState(null);
+  const [page, setPage] = useState(1);
+  const { totalPages } = useTablePagination(local.length);
 
   const load = async () => {
     setLoadError(null);
@@ -32,6 +35,7 @@ export default function Attendance() {
     }));
     setRows(data);
     setLocal(data.map((d) => ({ ...d })));
+    setPage(1);
   };
 
   const loadWithHandling = () => {
@@ -123,9 +127,9 @@ export default function Attendance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {local.map((r, index) => (
+                  {paginate(local, page).map((r, index) => (
                     <tr key={r.staff_id}>
-                      <td className="text-luxe-muted">{index + 1}</td>
+                      <td className="text-luxe-muted">{(page - 1) * 10 + index + 1}</td>
                       <td>{r.full_name}</td>
                       <td>
                         <Form.Select
@@ -180,6 +184,7 @@ export default function Attendance() {
                   ))}
                 </tbody>
               </Table>
+              <TablePagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
               {!loading && !loadError && local.length === 0 && (
                 <p className="text-muted text-center py-4 mb-0">
                   No staff found. Only users added from the <strong>Staff</strong> page with role <strong>Staff</strong> (not Admin or Receptionist) appear here. Add a team member with role &quot;Staff&quot; to see them in this list.

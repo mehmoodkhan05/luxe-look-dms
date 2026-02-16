@@ -29,7 +29,9 @@ router.get('/my-commission', async (req, res) => {
     if (!staffId) return res.json({ commissionEarned: 0, invoices: [] });
     const [rows] = await pool.query(
       `SELECT i.id, i.invoice_number, i.total_amount, i.created_at
-       FROM invoices i WHERE i.staff_id = ? AND i.payment_status = 'paid'
+       FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE i.staff_id = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')
        AND i.created_at >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
        ORDER BY i.created_at DESC`,
       [staffId]
@@ -54,7 +56,9 @@ router.post('/calculate', requireRole('admin'), async (req, res) => {
     const [start, end] = [monthYear + '-01', monthYear + '-31'];
     for (const st of staffList) {
       const [inv] = await pool.query(
-        `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE staff_id = ? AND payment_status = 'paid' AND DATE(created_at) BETWEEN ? AND ?`,
+        `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+         LEFT JOIN appointments a ON a.id = i.appointment_id
+         WHERE i.staff_id = ? AND i.payment_status = 'paid' AND DATE(i.created_at) BETWEEN ? AND ? AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
         [st.id, start, end]
       );
       const rev = Number(inv[0].total);
@@ -62,7 +66,9 @@ router.post('/calculate', requireRole('admin'), async (req, res) => {
       if (st.commission_type === 'percentage') commission = (rev * st.commission_value) / 100;
       else commission = 0; // fixed would need count of services
       const [count] = await pool.query(
-        `SELECT COUNT(*) as c FROM invoice_items ii JOIN invoices i ON i.id = ii.invoice_id WHERE i.staff_id = ? AND i.payment_status = 'paid' AND DATE(i.created_at) BETWEEN ? AND ?`,
+        `SELECT COUNT(*) as c FROM invoice_items ii JOIN invoices i ON i.id = ii.invoice_id
+         LEFT JOIN appointments a ON a.id = i.appointment_id
+         WHERE i.staff_id = ? AND i.payment_status = 'paid' AND DATE(i.created_at) BETWEEN ? AND ? AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
         [st.id, start, end]
       );
       if (st.commission_type === 'fixed') commission = (count[0].c || 0) * st.commission_value;

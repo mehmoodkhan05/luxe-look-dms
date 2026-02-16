@@ -27,11 +27,15 @@ router.get('/overview', async (req, res) => {
       [today]
     );
     const [todayRevenue] = await pool.query(
-      `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) = ? AND payment_status = 'paid'`,
+      `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE DATE(i.created_at) = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
       [today]
     );
     const [monthlyRevenue] = await pool.query(
-      `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) >= ? AND payment_status = 'paid'`,
+      `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+       LEFT JOIN appointments a ON a.id = i.appointment_id
+       WHERE DATE(i.created_at) >= ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
       [startOfMonth]
     );
     const [lowStock] = await pool.query(
@@ -66,7 +70,9 @@ router.get('/weekly-revenue', async (req, res) => {
       d.setDate(d.getDate() - i);
       const dateStr = formatDate(d);
       const [rows] = await pool.query(
-        `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE DATE(created_at) = ? AND payment_status = 'paid'`,
+        `SELECT COALESCE(SUM(i.total_amount), 0) as total FROM invoices i
+         LEFT JOIN appointments a ON a.id = i.appointment_id
+         WHERE DATE(i.created_at) = ? AND i.payment_status = 'paid' AND (i.appointment_id IS NULL OR a.status != 'cancelled')`,
         [dateStr]
       );
       result.push({ date: dateStr, revenue: Number(rows[0].total) });
@@ -96,10 +102,13 @@ router.get('/monthly-service-trend', async (req, res) => {
 router.get('/top-staff', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT st.id, u.full_name, COUNT(i.id) as services_count, COALESCE(SUM(i.total_amount), 0) as revenue
+      `SELECT st.id, u.full_name,
+         COUNT(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.id END) as services_count,
+         COALESCE(SUM(CASE WHEN i.appointment_id IS NULL OR a.status != 'cancelled' THEN i.total_amount ELSE 0 END), 0) as revenue
        FROM staff st
        JOIN users u ON u.id = st.user_id
        LEFT JOIN invoices i ON i.staff_id = st.id AND i.payment_status = 'paid' AND i.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+       LEFT JOIN appointments a ON a.id = i.appointment_id
        GROUP BY st.id, u.full_name ORDER BY revenue DESC LIMIT 5`
     );
     res.json(rows.map(r => ({ ...r, revenue: Number(r.revenue) })));

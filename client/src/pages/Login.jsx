@@ -28,12 +28,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(180deg, #0f0f14 0%, #1a1a24 100%)' }}>
+    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(180deg, #0f0f14 0%, #1a1a24 50%, #59326722 100%)' }}>
       <Container>
         <Row className="justify-content-center">
           <Col xs={12} sm={10} md={8} lg={4}>
             <div className="text-center mb-4">
-              <span className="display-4">✨</span>
+              <img src={`${import.meta.env.BASE_URL}logobg.jpg`} alt="Luxe Look Parlour" className="luxe-logo-login" decoding="async" />
               <h1 className="h3 mt-2 text-luxe-gold">Luxe Look</h1>
               <p className="text-luxe-muted small">Dashboard Management System</p>
             </div>

@@ -4,9 +4,11 @@
   --luxe-navbar-bg: rgb(250, 248, 243);
   --luxe-sidebar-text: #1a1a1a;
   --luxe-navbar-text: #1a1a1a;
-  --luxe-gold: #c9a962;
-  --luxe-gold-light: #e8d5a3;
-  --luxe-gold-dark: #8b7355;
+  /* Primary: dark purple from Luxe Look branding (#593267) */
+  --luxe-gold: #593267;
+  --luxe-gold-light: #7b4d8a;
+  --luxe-gold-dark: #452654;
+  --luxe-primary-rgb: 89, 50, 103;
   --luxe-bg: #0f0f14;
   --luxe-card: #1a1a24;
   --luxe-card-hover: #22222e;
@@ -58,7 +60,7 @@ body {
 }
 
 .card-header {
-  background: rgba(201, 169, 98, 0.08);
+  background: rgba(var(--luxe-primary-rgb), 0.08);
   border-bottom: 1px solid var(--luxe-border);
   font-weight: 600;
   color: var(--luxe-gold-light);
@@ -75,17 +77,24 @@ body {
   background: var(--luxe-bg);
   border-color: var(--luxe-gold);
   color: var(--luxe-text);
-  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.2);
+  box-shadow: 0 0 0 3px rgba(var(--luxe-primary-rgb), 0.2);
 }
 
 .form-control::placeholder {
   color: var(--luxe-muted);
 }
 
+/* Dark mode: white calendar icons in date/month inputs (native picker) */
+[data-theme="dark"] .form-control[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] .form-control[type="month"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.9;
+}
+
 .btn-luxe {
   background: linear-gradient(135deg, var(--luxe-gold), var(--luxe-gold-dark));
   border: none;
-  color: #0f0f14;
+  color: #fff;
   font-weight: 600;
   border-radius: 10px;
   padding: 0.5rem 1.25rem;
@@ -93,7 +102,7 @@ body {
 
 .btn-luxe:hover {
   background: linear-gradient(135deg, var(--luxe-gold-light), var(--luxe-gold));
-  color: #0f0f14;
+  color: #fff;
   border: none;
 }
 
@@ -106,7 +115,7 @@ body {
 }
 
 .btn-outline-luxe:hover {
-  background: rgba(201, 169, 98, 0.15);
+  background: rgba(var(--luxe-primary-rgb), 0.15);
   color: var(--luxe-gold-light);
   border-color: var(--luxe-gold);
 }
@@ -118,14 +127,14 @@ body {
   --bs-table-bg: transparent !important;
   --bs-table-color: var(--luxe-text) !important;
   --bs-table-border-color: var(--luxe-border) !important;
-  --bs-table-hover-bg: rgba(201, 169, 98, 0.08) !important;
+  --bs-table-hover-bg: rgba(var(--luxe-primary-rgb), 0.08) !important;
   --bs-table-hover-color: var(--luxe-text) !important;
 }
 
 .table thead th {
   border-color: var(--luxe-border) !important;
   color: var(--luxe-gold-light) !important;
-  background: rgba(201, 169, 98, 0.1) !important;
+  background: rgba(var(--luxe-primary-rgb), 0.1) !important;
   font-weight: 600;
 }
 
@@ -143,7 +152,7 @@ body {
 
 .table tbody tr:hover td,
 .table tbody tr:hover th {
-  background: rgba(201, 169, 98, 0.08) !important;
+  background: rgba(var(--luxe-primary-rgb), 0.08) !important;
   color: var(--luxe-text) !important;
 }
 
@@ -168,7 +177,7 @@ body {
 
 .nav-pills .nav-link.active {
   background: linear-gradient(135deg, var(--luxe-gold), var(--luxe-gold-dark));
-  color: #0f0f14;
+  color: #fff;
 }
 
 .modal-content {
@@ -235,6 +244,11 @@ p, span, li, div, h1, h2, h3, h4, h5, h6 {
 .badge.bg-dark {
   background-color: #495057 !important;
   color: #fff !important;
+}
+
+/* Buttons - consistent icon/button border radius */
+.btn {
+  border-radius: 10px;
 }
 
 /* Buttons - secondary and outline variants */
@@ -308,7 +322,7 @@ select option {
 .pagination .page-item.active .page-link {
   background: var(--luxe-gold) !important;
   border-color: var(--luxe-gold) !important;
-  color: #0f0f14 !important;
+  color: #fff !important;
 }
 
 .pagination .page-item.disabled .page-link {
@@ -342,6 +356,27 @@ select option {
   color: #fff !important;
 }
 
+.luxe-logo-nav {
+  display: block;
+  width: 50px;
+  max-width: 120px;
+  object-fit: contain;
+  object-position: left center;
+  vertical-align: middle;
+  border-radius: 10px;
+}
+
+.luxe-logo-login {
+  display: block;
+  height: 3.5rem;
+  width: auto;
+  max-width: 180px;
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+}
+
 [data-theme="light"] .navbar-brand-luxe:hover {
   color: var(--luxe-gold-dark) !important;
 }
@@ -349,10 +384,13 @@ select option {
 .luxe-offcanvas {
   background: var(--luxe-sidebar-bg) !important;
   color: var(--luxe-sidebar-text);
+  width: 50%;
+  max-width: 50%;
+  min-width: 240px;
 }
 
 .luxe-offcanvas .nav-link.active {
-  background: rgba(201, 169, 98, 0.2);
+  background: rgba(var(--luxe-primary-rgb), 0.2);
   color: var(--luxe-gold) !important;
 }
 
@@ -385,12 +423,12 @@ select option {
 }
 
 .sidebar-link:hover {
-  background: rgba(201, 169, 98, 0.12);
+  background: rgba(var(--luxe-primary-rgb), 0.12);
   color: var(--luxe-gold) !important;
 }
 
 .sidebar-link.active {
-  background: rgba(201, 169, 98, 0.2);
+  background: rgba(var(--luxe-primary-rgb), 0.2);
   color: var(--luxe-gold) !important;
   font-weight: 600;
 }
@@ -413,7 +451,7 @@ select option {
 }
 
 .sidebar-collapse-trigger:hover {
-  background: rgba(201, 169, 98, 0.12) !important;
+  background: rgba(var(--luxe-primary-rgb), 0.12) !important;
   color: var(--luxe-gold) !important;
 }
 
@@ -504,7 +542,7 @@ select option {
 
 [data-theme="light"] .card-header {
   color: var(--luxe-gold-dark);
-  background: rgba(201, 169, 98, 0.1);
+  background: rgba(var(--luxe-primary-rgb), 0.1);
 }
 
 [data-theme="light"] .table,
@@ -516,7 +554,7 @@ select option {
 
 [data-theme="light"] .table thead th {
   color: var(--luxe-gold-dark);
-  background: rgba(201, 169, 98, 0.15) !important;
+  background: rgba(var(--luxe-primary-rgb), 0.15) !important;
 }
 
 [data-theme="light"] .luxe-offcanvas {
@@ -525,6 +563,20 @@ select option {
 
 [data-theme="light"] .luxe-offcanvas .btn-close {
   filter: none;
+}
+
+/* Settings: color picker square rounded corners */
+.settings-color-picker {
+  border-radius: 10px;
+  overflow: hidden;
+}
+.settings-color-picker::-webkit-color-swatch-wrapper {
+  padding: 2px;
+  border-radius: 8px;
+}
+.settings-color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
 }
 
 @media (max-width: 768px) {
