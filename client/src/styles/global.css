@@ -2,8 +2,8 @@
 [data-theme="dark"] {
   --luxe-sidebar-bg: rgb(245, 240, 230);
   --luxe-navbar-bg: rgb(250, 248, 243);
-  --luxe-sidebar-text: #1a1a1a;
-  --luxe-navbar-text: #1a1a1a;
+  --luxe-sidebar-text: #1a1a1a; /* Will be dynamically updated based on background */
+  --luxe-navbar-text: #1a1a1a; /* Will be dynamically updated based on background */
   /* Primary: dark purple from Luxe Look branding (#593267) */
   --luxe-gold: #593267;
   --luxe-gold-light: #7b4d8a;

@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Navbar, Nav, Offcanvas, Button, Collapse } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import logoImage from '../assets/logobg.jpg';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊', roles: ['admin', 'receptionist', 'staff'] },
@@ -52,7 +53,7 @@ export default function Layout() {
       <Navbar expand="md" className="luxe-navbar border-bottom border-secondary">
         <Container fluid className="px-3 px-md-4">
           <Navbar.Brand as={NavLink} to="/" className="navbar-brand-luxe d-flex align-items-center gap-2 fw-bold">
-            <img src={`${import.meta.env.BASE_URL}logobg.jpg`} alt="Luxe Look Parlour" className="luxe-logo-nav" decoding="async" fetchPriority="high" />
+            <img src={logoImage} alt="Luxe Look Parlour" className="luxe-logo-nav" decoding="async" fetchPriority="high" />
             <span className="d-none d-sm-inline text-luxe-gold">Luxe Look</span>
           </Navbar.Brand>
           <div className="d-flex align-items-center gap-2 gap-md-3">

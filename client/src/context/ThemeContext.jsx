@@ -34,6 +34,22 @@ function clampRgb(v) {
   return Math.min(255, Math.max(0, n));
 }
 
+// Calculate relative luminance (WCAG formula)
+function getLuminance({ r, g, b }) {
+  const [rs, gs, bs] = [r, g, b].map((val) => {
+    const v = val / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+// Determine appropriate text color based on background brightness
+function getContrastTextColor(bgColor) {
+  const luminance = getLuminance(bgColor);
+  // If background is light (luminance > 0.5), use dark text; otherwise use light text
+  return luminance > 0.5 ? '#1a1a1a' : '#f0ebe3';
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'light');
   const [sidebarColor, setSidebarColorState] = useState(() => parseStoredColor(SIDEBAR_COLOR_KEY, DEFAULT_SIDEBAR));
@@ -45,8 +61,14 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   useEffect(() => {
+    const sidebarTextColor = getContrastTextColor(sidebarColor);
+    const navbarTextColor = getContrastTextColor(navbarColor);
+    
     document.documentElement.style.setProperty('--luxe-sidebar-bg', rgbToCss(sidebarColor));
     document.documentElement.style.setProperty('--luxe-navbar-bg', rgbToCss(navbarColor));
+    document.documentElement.style.setProperty('--luxe-sidebar-text', sidebarTextColor);
+    document.documentElement.style.setProperty('--luxe-navbar-text', navbarTextColor);
+    
     localStorage.setItem(SIDEBAR_COLOR_KEY, JSON.stringify(sidebarColor));
     localStorage.setItem(NAVBAR_COLOR_KEY, JSON.stringify(navbarColor));
   }, [sidebarColor, navbarColor]);

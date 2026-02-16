@@ -4,6 +4,7 @@ import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import logoImage from '../assets/logobg.jpg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -28,17 +29,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(180deg, #0f0f14 0%, #1a1a24 50%, #59326722 100%)' }}>
+    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3">
       <Container>
         <Row className="justify-content-center">
           <Col xs={12} sm={10} md={8} lg={4}>
-            <div className="text-center mb-4">
-              <img src={`${import.meta.env.BASE_URL}logobg.jpg`} alt="Luxe Look Parlour" className="luxe-logo-login" decoding="async" />
-              <h1 className="h3 mt-2 text-luxe-gold">Luxe Look</h1>
-              <p className="text-luxe-muted small">Dashboard Management System</p>
-            </div>
             <Card className="border-0 shadow-lg">
               <Card.Body className="p-4 p-md-5">
+                <div className="text-center mb-4">
+                  <img src={logoImage} alt="Luxe Look Parlour" className="luxe-logo-login" decoding="async" />
+                  <h1 className="h3 mt-2 text-luxe-gold">Luxe Look</h1>
+                  <p className="text-luxe-muted small">Dashboard Management System</p>
+                </div>
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
                     <Form.Label>Email</Form.Label>
@@ -64,9 +65,6 @@ export default function Login() {
                     {loading ? 'Signing in…' : 'Sign in'}
                   </Button>
                 </Form>
-                <p className="text-center text-muted small mt-3 mb-0">
-                  Default: admin@luxelook.com / admin123
-                </p>
               </Card.Body>
             </Card>
           </Col>
