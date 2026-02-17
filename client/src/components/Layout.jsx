@@ -7,7 +7,7 @@ import logoImage from '../assets/logobg.jpg';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊', roles: ['admin', 'receptionist', 'staff'] },
-  { to: '/customers', label: 'Customers', icon: '👤', roles: ['admin', 'receptionist'] },
+  { to: '/customers', label: 'Customers', icon: '👤', roles: ['admin', 'receptionist', 'staff'] },
   { to: '/appointments', label: 'Appointments', icon: '📅', roles: ['admin', 'receptionist', 'staff'] },
   { to: '/services', label: 'Services', icon: '✂️', roles: ['admin', 'staff'] },
   { to: '/invoices', label: 'Invoices', icon: '🧾', roles: ['admin', 'receptionist', 'staff'] },
@@ -53,7 +53,7 @@ export default function Layout() {
       <Navbar expand="md" className="luxe-navbar border-bottom border-secondary">
         <Container fluid className="px-3 px-md-4">
           <Navbar.Brand as={NavLink} to="/" className="navbar-brand-luxe d-flex align-items-center gap-2 fw-bold">
-            <img src={logoImage} alt="Luxe Look Parlour" className="luxe-logo-nav" decoding="async" fetchPriority="high" />
+            <img src={logoImage} alt="Luxe Look Parlour" className="luxe-logo-nav" decoding="async" fetchpriority="high" />
             <span className="d-none d-sm-inline text-luxe-gold">Luxe Look</span>
           </Navbar.Brand>
           <div className="d-flex align-items-center gap-2 gap-md-3">

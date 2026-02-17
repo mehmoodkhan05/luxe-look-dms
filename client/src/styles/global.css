@@ -342,6 +342,12 @@ select option {
 .luxe-navbar {
   background: var(--luxe-navbar-bg) !important;
   border-color: var(--luxe-border) !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  width: 100%;
 }
 
 .luxe-navbar .text-luxe-muted {
@@ -399,12 +405,14 @@ select option {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-top: 56px; /* Navbar height */
 }
 
 .layout-body {
   display: flex;
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
 .sidebar {
@@ -413,6 +421,32 @@ select option {
   background: var(--luxe-sidebar-bg);
   border-right: 1px solid var(--luxe-border);
   padding-top: 0.5rem;
+  position: fixed;
+  top: 56px; /* Navbar height */
+  left: 0;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(var(--luxe-primary-rgb), 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--luxe-primary-rgb), 0.5);
 }
 
 .sidebar-link {
@@ -510,6 +544,7 @@ select option {
 .layout-main {
   flex: 1;
   overflow-x: hidden;
+  margin-left: 220px; /* Sidebar width */
 }
 
 .theme-toggle:hover {

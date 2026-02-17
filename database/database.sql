@@ -1,8 +1,8 @@
 -- Luxe Look Parlor Dashboard Management System - Complete Database
 -- Single file for cPanel / phpMyAdmin import
 
-CREATE DATABASE IF NOT EXISTS luxe_look_dms;
-USE luxe_look_dms;
+CREATE DATABASE IF NOT EXISTS webypixels_luxe_look;
+USE webypixels_luxe_look;
 
 -- Users (staff with login: admin, receptionist, staff)
 CREATE TABLE users (
@@ -41,8 +41,10 @@ CREATE TABLE services (
   id INT PRIMARY KEY AUTO_INCREMENT,
   category_id INT NOT NULL,
   name VARCHAR(255) NOT NULL,
-  duration_minutes INT DEFAULT 60,
+  variant VARCHAR(255) DEFAULT NULL COMMENT 'Optional variant/option (e.g., With Base Color, Without Base Color)',
+  duration_minutes INT DEFAULT 0,
   price DECIMAL(10,2) NOT NULL,
+  discount_percentage DECIMAL(5,2) DEFAULT 0,
   commission_percentage DECIMAL(5,2) DEFAULT 0,
   commission_fixed DECIMAL(10,2) DEFAULT 0,
   is_active TINYINT(1) DEFAULT 1,
@@ -208,6 +210,24 @@ CREATE TABLE audit_logs (
 
 -- Default admin is created by server seed on first run (admin@luxelook.com / admin123)
 
--- Migration: add half-day times to existing attendance table (run if table already exists)
+-- ============================================================================
+-- MIGRATIONS FOR EXISTING DATABASES
+-- ============================================================================
+-- If you have an existing database, run the appropriate ALTER statements below
+-- based on what columns are missing from your current schema.
+
+-- Migration: Add discount_percentage column to services table (if missing)
+-- ALTER TABLE services 
+-- ADD COLUMN discount_percentage DECIMAL(5,2) DEFAULT 0 AFTER price;
+
+-- Migration: Update duration_minutes default value to 0 (for new records)
+-- ALTER TABLE services 
+-- MODIFY COLUMN duration_minutes INT DEFAULT 0;
+
+-- Migration: Add variant column to services table (if missing)
+-- ALTER TABLE services 
+-- ADD COLUMN variant VARCHAR(255) DEFAULT NULL COMMENT 'Optional variant/option (e.g., With Base Color, Without Base Color)' AFTER name;
+
+-- Migration: Add half-day times to existing attendance table (if missing)
 -- ALTER TABLE attendance ADD COLUMN half_day_from TIME NULL AFTER notes;
 -- ALTER TABLE attendance ADD COLUMN half_day_to TIME NULL AFTER half_day_from;

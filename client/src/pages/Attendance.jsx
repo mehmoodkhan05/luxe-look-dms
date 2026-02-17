@@ -108,7 +108,7 @@ export default function Attendance() {
             <div className="text-center py-4"><Spinner className="text-warning" /></div>
           ) : loadError ? (
             <div className="text-center py-4">
-              <p className="text-danger mb-2">Could not load attendance.</p>
+              <p className="text-danger mb-2">No staff found.</p>
               <p className="text-muted small mb-3">{loadError}</p>
               <p className="text-luxe-muted small mb-3">On cPanel, ensure the full server (including <code>routes/attendance.js</code>) is deployed, the <code>attendance</code> table exists (run <code>database.sql</code> in MySQL), and the API URL is correct.</p>
               <Button variant="outline-warning" onClick={loadWithHandling}>Retry</Button>
@@ -187,7 +187,7 @@ export default function Attendance() {
               <TablePagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
               {!loading && !loadError && local.length === 0 && (
                 <p className="text-muted text-center py-4 mb-0">
-                  No staff found. Only users added from the <strong>Staff</strong> page with role <strong>Staff</strong> (not Admin or Receptionist) appear here. Add a team member with role &quot;Staff&quot; to see them in this list.
+                  No staff found.
                 </p>
               )}
             </>

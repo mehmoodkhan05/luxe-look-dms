@@ -158,7 +158,7 @@ export default function Appointments() {
             <Form.Label>Service</Form.Label>
             <Form.Select value={form.serviceId} onChange={(e) => setForm((f) => ({ ...f, serviceId: e.target.value }))} required>
               <option value="">Select service</option>
-              {services.map((s) => <option key={s.id} value={s.id}>{s.name} – PKR {s.price}</option>)}
+              {services.map((s) => <option key={s.id} value={s.id}>{s.name}{s.variant ? ` (${s.variant})` : ''} – PKR {s.price}</option>)}
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-2">

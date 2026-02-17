@@ -1,15 +1,15 @@
 import { Pagination } from 'react-bootstrap';
 
-const ITEMS_PER_PAGE = 10;
+const DEFAULT_ITEMS_PER_PAGE = 10;
 
-export function paginate(list, page) {
-  const start = (page - 1) * ITEMS_PER_PAGE;
-  return list.slice(start, start + ITEMS_PER_PAGE);
+export function paginate(list, page, itemsPerPage = DEFAULT_ITEMS_PER_PAGE) {
+  const start = (page - 1) * itemsPerPage;
+  return list.slice(start, start + itemsPerPage);
 }
 
-export function useTablePagination(totalItems) {
-  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
-  return { itemsPerPage: ITEMS_PER_PAGE, totalPages };
+export function useTablePagination(totalItems, itemsPerPage = DEFAULT_ITEMS_PER_PAGE) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  return { itemsPerPage, totalPages };
 }
 
 export default function TablePagination({ currentPage, totalPages, onPageChange }) {

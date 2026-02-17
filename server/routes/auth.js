@@ -21,10 +21,10 @@ router.post(
         'SELECT id, email, password_hash, role, full_name FROM users WHERE email = ? AND is_active = 1',
         [email]
       );
-      if (!rows.length) return res.status(401).json({ error: 'Invalid credentials' });
+      if (!rows.length) return res.status(401).json({ error: 'No account found' });
       const user = rows[0];
       const match = await bcrypt.compare(password, user.password_hash);
-      if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+      if (!match) return res.status(401).json({ error: 'Email or password incorrect' });
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         JWT_SECRET,

@@ -66,11 +66,11 @@ router.post(
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-      const { name, categoryId, duration_minutes, price, commission_percentage, commission_fixed } = req.body;
+      const { name, categoryId, variant, duration_minutes, price, commission_percentage, commission_fixed, discount_percentage } = req.body;
       const [result] = await pool.query(
-        `INSERT INTO services (category_id, name, duration_minutes, price, commission_percentage, commission_fixed)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [categoryId, name, duration_minutes || 60, price, commission_percentage || 0, commission_fixed || 0]
+        `INSERT INTO services (category_id, name, variant, duration_minutes, price, commission_percentage, commission_fixed, discount_percentage)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [categoryId, name, variant || null, duration_minutes || 0, price, commission_percentage || 0, commission_fixed || 0, discount_percentage || 0]
       );
       res.status(201).json({ id: result.insertId, name, categoryId, price });
     } catch (err) {
@@ -81,15 +81,17 @@ router.post(
 
 router.put('/:id', requireRole('admin'), async (req, res) => {
   try {
-    const { name, categoryId, duration_minutes, price, commission_percentage, commission_fixed, is_active } = req.body;
+    const { name, categoryId, variant, duration_minutes, price, commission_percentage, commission_fixed, discount_percentage, is_active } = req.body;
     const updates = [];
     const params = [];
     if (name !== undefined) { updates.push('name = ?'); params.push(name); }
     if (categoryId !== undefined) { updates.push('category_id = ?'); params.push(categoryId); }
+    if (variant !== undefined) { updates.push('variant = ?'); params.push(variant || null); }
     if (duration_minutes !== undefined) { updates.push('duration_minutes = ?'); params.push(duration_minutes); }
     if (price !== undefined) { updates.push('price = ?'); params.push(price); }
     if (commission_percentage !== undefined) { updates.push('commission_percentage = ?'); params.push(commission_percentage); }
     if (commission_fixed !== undefined) { updates.push('commission_fixed = ?'); params.push(commission_fixed); }
+    if (discount_percentage !== undefined) { updates.push('discount_percentage = ?'); params.push(discount_percentage); }
     if (is_active !== undefined) { updates.push('is_active = ?'); params.push(is_active ? 1 : 0); }
     if (updates.length === 0) return res.status(400).json({ error: 'Nothing to update' });
     params.push(req.params.id);

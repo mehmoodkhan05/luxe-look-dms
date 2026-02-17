@@ -22,7 +22,8 @@ export default function Login() {
       toast.success('Welcome back!');
       navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed');
+      const errorMessage = err.response?.data?.error || 'Login failed';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ export default function Login() {
                     <Form.Label>Email</Form.Label>
                     <Form.Control
                       type="email"
-                      placeholder="admin@luxelook.com"
+                      placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required

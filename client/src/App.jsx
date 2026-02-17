@@ -29,7 +29,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<Dashboard />} />
-        <Route path="customers" element={<PrivateRoute roles={['admin', 'receptionist']}><Customers /></PrivateRoute>} />
+        <Route path="customers" element={<PrivateRoute roles={['admin', 'receptionist', 'staff']}><Customers /></PrivateRoute>} />
         <Route path="appointments" element={<Appointments />} />
         <Route path="services" element={<PrivateRoute roles={['admin', 'staff']}><Services /></PrivateRoute>} />
         <Route path="invoices" element={<PrivateRoute roles={['admin', 'receptionist', 'staff']}><Invoices /></PrivateRoute>} />
