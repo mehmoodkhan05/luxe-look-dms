@@ -367,7 +367,7 @@ export default function Settings() {
         </Tab>
       </Tabs>
 
-      <Modal show={viewModal} onHide={() => { setViewModal(false); setViewingStaff(null); }} centered>
+      <Modal show={viewModal} onHide={() => { setViewModal(false); setViewingStaff(null); }} centered fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>Staff Details</Modal.Title></Modal.Header>
         <Modal.Body>
           {viewingStaff && (
@@ -403,7 +403,7 @@ export default function Settings() {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={staffModal} onHide={() => { setStaffModal(false); setEditingStaff(null); }} centered backdrop="static">
+      <Modal show={staffModal} onHide={() => { setStaffModal(false); setEditingStaff(null); }} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>Edit Staff Account</Modal.Title></Modal.Header>
         <Form onSubmit={handleStaffSave}>
           <Modal.Body>

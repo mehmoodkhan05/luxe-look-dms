@@ -44,14 +44,14 @@ export default function Payroll() {
 
   return (
     <>
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
         <h1 className="h4 text-luxe-gold mb-0">Payroll</h1>
-        <div className="d-flex gap-2 align-items-center">
+        <div className="d-flex flex-wrap gap-2 align-items-center">
           <Form.Control
             type="month"
             value={monthYear}
             onChange={(e) => setMonthYear(e.target.value)}
-            className="w-auto"
+            className="w-auto flex-grow-1 flex-md-grow-0"
           />
           <Button className="btn-luxe" onClick={calculate} disabled={calculating}>
             {calculating ? 'Calculating…' : 'Calculate Payroll'}

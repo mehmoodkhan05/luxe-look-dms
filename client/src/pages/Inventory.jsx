@@ -95,7 +95,7 @@ export default function Inventory() {
 
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
         <h1 className="h4 text-luxe-gold mb-0">Inventory</h1>
         {canEdit && (
           <Button className="btn-luxe" onClick={openAdd} title="Add product"><i className="fas fa-plus me-1" /><span className="d-none d-sm-inline">Add Product</span></Button>
@@ -149,7 +149,7 @@ export default function Inventory() {
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static">
+      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>{form.id ? 'Edit Product' : 'Add Product'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">
@@ -187,7 +187,7 @@ export default function Inventory() {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={!!stockModal} onHide={() => setStockModal(null)} centered backdrop="static">
+      <Modal show={!!stockModal} onHide={() => setStockModal(null)} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>Stock – {stockModal?.name}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">

@@ -59,7 +59,7 @@ export default function Customers() {
 
   return (
     <>
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
         <h1 className="h4 text-luxe-gold mb-0">Customers</h1>
         <Button className="btn-luxe" onClick={openAdd} title="Add customer"><i className="fas fa-user-plus me-1" /><span className="d-none d-sm-inline">Add Customer</span></Button>
       </div>
@@ -114,7 +114,7 @@ export default function Customers() {
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static">
+      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>{editing ? 'Edit Customer' : 'Add Customer'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">

@@ -155,7 +155,7 @@ export default function Staff() {
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={() => { setShow(false); setEditing(null); }} centered backdrop="static">
+      <Modal show={show} onHide={() => { setShow(false); setEditing(null); }} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>{editing ? 'Edit Staff' : 'Add Staff'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">

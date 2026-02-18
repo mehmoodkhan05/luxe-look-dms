@@ -315,7 +315,7 @@ export default function Services() {
         </Card.Body>
       </Card>
 
-      <Modal show={showCat} onHide={() => setShowCat(false)} centered backdrop="static">
+      <Modal show={showCat} onHide={() => setShowCat(false)} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>Add Category</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Control placeholder="Category name (e.g. Hair, Nails)" value={catName} onChange={(e) => setCatName(e.target.value)} />
@@ -332,7 +332,7 @@ export default function Services() {
         setIsNewService(true); 
         setCategoryServices([]);
         setEditing(null);
-      }} centered backdrop="static">
+      }} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>{editing ? 'Edit Service' : 'Add Service'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">

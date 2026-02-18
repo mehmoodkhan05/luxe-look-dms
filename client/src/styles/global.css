@@ -390,8 +390,8 @@ select option {
 .luxe-offcanvas {
   background: var(--luxe-sidebar-bg) !important;
   color: var(--luxe-sidebar-text);
-  width: 50%;
-  max-width: 50%;
+  width: 75%;
+  max-width: 300px;
   min-width: 240px;
 }
 
@@ -544,7 +544,7 @@ select option {
 .layout-main {
   flex: 1;
   overflow-x: hidden;
-  margin-left: 220px; /* Sidebar width */
+  margin-left: 220px; /* Sidebar width - removed on mobile via media query */
 }
 
 .theme-toggle:hover {
@@ -614,11 +614,129 @@ select option {
   border-radius: 6px;
 }
 
-@media (max-width: 768px) {
+/* ========== Mobile responsive (small to large screens) ========== */
+
+/* Extra small & small phones (320px - 575px) */
+@media (max-width: 575.98px) {
+  .layout-wrapper {
+    padding-top: 56px;
+  }
+  .layout-main {
+    margin-left: 0;
+  }
+  .layout-body .container-fluid,
+  .layout-main .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .luxe-offcanvas {
+    width: 70%;
+    max-width: 260px;
+    min-width: 220px;
+  }
+  .luxe-navbar .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .navbar-brand-luxe .luxe-logo-nav {
+    width: 40px;
+  }
+  .card {
+    border-radius: 12px;
+  }
+  .table-responsive {
+    font-size: 0.85rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-responsive .table {
+    min-width: 600px;
+  }
+  .table td, .table th {
+    padding: 0.5rem 0.6rem;
+    white-space: nowrap;
+  }
+  .btn {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+  .btn-sm {
+    min-height: 36px;
+    padding: 0.25rem 0.5rem;
+  }
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  .modal-body, .modal-footer {
+    padding: 1rem;
+  }
+  .form-control, .form-select {
+    min-height: 44px;
+  }
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+  .pagination .page-link {
+    min-width: 38px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.5rem;
+  }
+  .page-header-flex {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .page-header-flex .form-control.w-auto {
+    width: 100% !important;
+  }
+}
+
+/* Small tablets / large phones (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .layout-main {
+    margin-left: 0;
+  }
+  .luxe-offcanvas {
+    width: 60%;
+    max-width: 260px;
+  }
   .card {
     border-radius: 12px;
   }
   .table-responsive {
     font-size: 0.9rem;
   }
+}
+
+/* Medium screens - sidebar visible (768px+) */
+@media (min-width: 768px) {
+  .layout-main {
+    margin-left: 220px;
+  }
+}
+
+/* Large screens - ensure smooth layout */
+@media (min-width: 992px) {
+  .layout-body .container-fluid {
+    max-width: 100%;
+  }
+}
+
+/* Modal fullscreen on small screens - applied via Bootstrap fullscreen="sm-down" in components */
+.modal-fullscreen-sm-down .modal-dialog {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.modal-fullscreen-sm-down .modal-content {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
 }

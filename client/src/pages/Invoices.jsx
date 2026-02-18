@@ -433,11 +433,11 @@ export default function Invoices() {
 
   return (
     <>
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
         <h1 className="h4 text-luxe-gold mb-0">Invoices</h1>
         <div className="d-flex gap-2 align-items-center flex-wrap">
-          <Form.Control type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-auto" />
-          <Form.Control type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-auto" />
+          <Form.Control type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-auto flex-grow-1 flex-md-grow-0" />
+          <Form.Control type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-auto flex-grow-1 flex-md-grow-0" />
           <Button className="btn-luxe" onClick={openNew} title="New invoice"><i className="fas fa-receipt me-1" /><span className="d-none d-sm-inline">New Invoice</span></Button>
         </div>
       </div>
@@ -482,7 +482,7 @@ export default function Invoices() {
       <Modal show={show} onHide={() => { 
         setShow(false); 
         setCategoryServicesMap({}); 
-      }} centered size="lg" backdrop="static">
+      }} centered size="lg" backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>New Invoice</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">
@@ -512,8 +512,8 @@ export default function Invoices() {
                   {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </Form.Select>
               </Form.Group>
-              <div className="d-flex gap-2">
-                <Form.Group className="mb-0 flex-grow-1">
+              <div className="d-flex flex-wrap gap-2 align-items-end">
+                <Form.Group className="mb-0 flex-grow-1" style={{ minWidth: '140px' }}>
                   <Form.Label className="small">Service</Form.Label>
                   <Form.Select value={it.serviceId} onChange={(e) => updateLine(i, 'serviceId', e.target.value)} disabled={!it.categoryId}>
                     <option value="">Select Service</option>
@@ -555,17 +555,17 @@ export default function Invoices() {
               </div>
             </div>
           ))}
-          <div className="d-flex gap-2 mt-2">
-            <Form.Group className="mb-0">
+          <div className="d-flex flex-wrap gap-2 mt-2">
+            <Form.Group className="mb-0 flex-grow-1" style={{ minWidth: '100px' }}>
               <Form.Label className="small">Tax</Form.Label>
               <Form.Control type="number" min={0} step={0.01} value={form.taxAmount} onChange={(e) => setForm((f) => ({ ...f, taxAmount: e.target.value }))} />
             </Form.Group>
-            <Form.Group className="mb-0">
+            <Form.Group className="mb-0 flex-grow-1" style={{ minWidth: '100px' }}>
               <Form.Label className="small">Discount</Form.Label>
               <Form.Control type="number" min={0} step={0.01} value={form.discount} onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))} />
               <Form.Text className="text-muted small">Auto-calculated from service discounts</Form.Text>
             </Form.Group>
-            <Form.Group className="mb-0">
+            <Form.Group className="mb-0 flex-grow-1" style={{ minWidth: '120px' }}>
               <Form.Label className="small">Payment</Form.Label>
               <Form.Select value={form.paymentMethod} onChange={(e) => setForm((f) => ({ ...f, paymentMethod: e.target.value }))}>
                 <option value="cash">Cash</option>
@@ -583,7 +583,7 @@ export default function Invoices() {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={!!detail} onHide={() => { setDetail(null); setDetailPage(1); }} centered backdrop="static" size="lg">
+      <Modal show={!!detail} onHide={() => { setDetail(null); setDetailPage(1); }} centered backdrop="static" size="lg" fullscreen="sm-down">
         <Modal.Header closeButton>
           <Modal.Title>Invoice {detail?.invoice_number}</Modal.Title>
         </Modal.Header>

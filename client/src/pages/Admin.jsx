@@ -255,7 +255,7 @@ export default function Admin() {
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={() => { setShow(false); setEditing(null); }} centered backdrop="static">
+      <Modal show={show} onHide={() => { setShow(false); setEditing(null); }} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton>
           <Modal.Title>{editing ? 'Edit Expense' : 'Add Expense'}</Modal.Title>
         </Modal.Header>

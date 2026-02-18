@@ -87,14 +87,14 @@ export default function Appointments() {
 
   return (
     <>
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
         <h1 className="h4 text-luxe-gold mb-0">Appointments</h1>
-        <div className="d-flex gap-2 align-items-center">
+        <div className="d-flex flex-wrap gap-2 align-items-center">
           <Form.Control
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="w-auto"
+            className="w-auto flex-grow-1 flex-md-grow-0"
           />
           <Button className="btn-luxe" onClick={openAdd} title="New appointment"><i className="fas fa-calendar-plus me-1" /><span className="d-none d-sm-inline">New Appointment</span></Button>
         </div>
@@ -144,7 +144,7 @@ export default function Appointments() {
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static">
+      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" fullscreen="sm-down">
         <Modal.Header closeButton><Modal.Title>New Appointment</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-2">

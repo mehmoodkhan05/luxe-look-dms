@@ -71,7 +71,7 @@ export default function Dashboard() {
 
       <Row className="g-3 mb-4">
         {kpis.map((k) => (
-          <Col xs={12} sm={6} md={user?.role === 'staff' ? 4 : 2} key={k.label}>
+          <Col xs={12} sm={6} md={4} lg={user?.role === 'staff' ? 4 : 2} key={k.label}>
             <Card className="h-100 border-0 shadow-sm">
               <Card.Body className="d-flex flex-column justify-content-center py-3">
                 <span className="fs-4 mb-1">{k.icon}</span>
