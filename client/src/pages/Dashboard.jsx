@@ -123,9 +123,9 @@ export default function Dashboard() {
                   <p className="text-muted small mb-0">No service data yet</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={serviceTrend} layout="vertical" margin={{ left: 80 }}>
+                    <BarChart data={serviceTrend} layout="vertical" margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
                       <XAxis type="number" stroke="#8a8580" />
-                      <YAxis type="category" dataKey="name" stroke="#8a8580" width={70} />
+                      <YAxis type="category" dataKey="name" stroke="#8a8580" width={100} />
                       <Tooltip contentStyle={{ background: '#1a1a24', border: '1px solid #2d2d3a' }} />
                       <Bar dataKey="count" fill="#c9a962" radius={[0, 4, 4, 0]} />
                     </BarChart>
@@ -138,8 +138,8 @@ export default function Dashboard() {
       ) : (
         <>
           <Row className="g-4">
-            <Col lg={8}>
-              <Card>
+            <Col xs={12} lg={8} className="order-2 order-lg-1">
+              <Card className="mb-4">
                 <Card.Header>Weekly Revenue</Card.Header>
                 <Card.Body>
                   <ResponsiveContainer width="100%" height={280}>
@@ -152,8 +152,25 @@ export default function Dashboard() {
                   </ResponsiveContainer>
                 </Card.Body>
               </Card>
+              <Card>
+                <Card.Header>Monthly Service Trend</Card.Header>
+                <Card.Body>
+                  {serviceTrend.length === 0 ? (
+                    <p className="text-muted small mb-0">No service data yet</p>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <BarChart data={serviceTrend} layout="vertical" margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
+                        <XAxis type="number" stroke="#8a8580" />
+                        <YAxis type="category" dataKey="name" stroke="#8a8580" width={100} />
+                        <Tooltip contentStyle={{ background: '#1a1a24', border: '1px solid #2d2d3a' }} />
+                        <Bar dataKey="count" fill="#c9a962" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </Card.Body>
+              </Card>
             </Col>
-            <Col lg={4}>
+            <Col xs={12} lg={4} className="order-1 order-lg-2">
               <Card className="mb-4">
                 <Card.Header>Top Performing Staff</Card.Header>
                 <Card.Body>
@@ -188,28 +205,6 @@ export default function Dashboard() {
                         </li>
                       ))}
                     </ul>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          <Row className="mt-4">
-            <Col>
-              <Card>
-                <Card.Header>Monthly Service Trend</Card.Header>
-                <Card.Body>
-                  {serviceTrend.length === 0 ? (
-                    <p className="text-muted small mb-0">No service data yet</p>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <BarChart data={serviceTrend} layout="vertical" margin={{ left: 80 }}>
-                        <XAxis type="number" stroke="#8a8580" />
-                        <YAxis type="category" dataKey="name" stroke="#8a8580" width={70} />
-                        <Tooltip contentStyle={{ background: '#1a1a24', border: '1px solid #2d2d3a' }} />
-                        <Bar dataKey="count" fill="#c9a962" radius={[0, 4, 4, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
                   )}
                 </Card.Body>
               </Card>
