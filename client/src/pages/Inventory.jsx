@@ -12,7 +12,7 @@ export default function Inventory() {
   const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [stockModal, setStockModal] = useState(null);
-  const [form, setForm] = useState({ name: '', sku: '', unit: 'pcs', current_stock: 0, reorder_level: 5, supplier_name: '', supplier_contact: '' });
+  const [form, setForm] = useState({ name: '', sku: '', unit: 'pcs', current_stock: 0, reorder_level: 0, supplier_name: '', supplier_contact: '' });
   const [stockForm, setStockForm] = useState({ type: 'purchase', quantity: '', notes: '' });
   const [saving, setSaving] = useState(false);
   const [page, setPage] = useState(1);
@@ -25,7 +25,7 @@ export default function Inventory() {
   }, []);
 
   const openAdd = () => {
-    setForm({ name: '', sku: '', unit: 'pcs', current_stock: 0, reorder_level: 5, supplier_name: '', supplier_contact: '' });
+    setForm({ name: '', sku: '', unit: 'pcs', current_stock: 0, reorder_level: 0, supplier_name: '', supplier_contact: '' });
     setShow(true);
   };
 
@@ -36,7 +36,7 @@ export default function Inventory() {
       sku: p.sku || '',
       unit: p.unit || 'pcs',
       current_stock: p.current_stock,
-      reorder_level: p.reorder_level ?? 5,
+      reorder_level: p.reorder_level ?? 0,
       supplier_name: p.supplier_name || '',
       supplier_contact: p.supplier_contact || '',
     });
@@ -96,7 +96,7 @@ export default function Inventory() {
   return (
     <>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 page-header-flex">
-        <h1 className="h4 text-luxe-gold mb-0">Inventory</h1>
+        <h1 className="h4 text-luxe-gold mb-0">Add products</h1>
         {canEdit && (
           <Button className="btn-luxe" onClick={openAdd} title="Add product"><i className="fas fa-plus me-1" /><span className="d-none d-sm-inline">Add Product</span></Button>
         )}

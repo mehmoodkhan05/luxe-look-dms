@@ -5,15 +5,17 @@ import { authMiddleware, getStaffIdFromUserId } from '../middleware/auth.js';
 const router = Router();
 router.use(authMiddleware);
 
-function generateInvoiceNumber() {
-  return 'INV-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+function formatInvoiceNumber(id) {
+  return 'INV-' + String(id).padStart(4, '0');
 }
 
 router.get('/', async (req, res) => {
   try {
     const { from, to, customerId, paymentStatus } = req.query;
     let sql = `
-      SELECT i.*, c.full_name as customer_name, u.full_name as staff_name
+      SELECT i.*, c.full_name as customer_name, u.full_name as staff_name,
+        (SELECT GROUP_CONCAT(COALESCE(ii.service_name, ii.product_name) SEPARATOR ', ')
+         FROM invoice_items ii WHERE ii.invoice_id = i.id) as items_summary
       FROM invoices i
       JOIN customers c ON c.id = i.customer_id
       LEFT JOIN staff st ON st.id = i.staff_id
@@ -61,20 +63,30 @@ router.post('/', async (req, res) => {
     }
     const subtotal = items.reduce((sum, i) => sum + (i.unit_price * (i.quantity || 1)), 0);
     const total = subtotal + (taxAmount || 0) - (discount || 0);
-    const invNum = generateInvoiceNumber();
+    const tempInvNum = 'INV-TMP-' + Date.now();
     const [result] = await pool.query(
       `INSERT INTO invoices (invoice_number, appointment_id, customer_id, staff_id, subtotal, tax_amount, discount, total_amount, payment_method, payment_status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [invNum, appointmentId || null, customerId, staffId || null, subtotal, taxAmount || 0, discount || 0, total, paymentMethod || 'cash', paymentStatus || 'paid']
+      [tempInvNum, appointmentId || null, customerId, staffId || null, subtotal, taxAmount || 0, discount || 0, total, paymentMethod || 'cash', paymentStatus || 'paid']
     );
     const invoiceId = result.insertId;
+    const invNum = formatInvoiceNumber(invoiceId);
+    await pool.query('UPDATE invoices SET invoice_number = ? WHERE id = ?', [invNum, invoiceId]);
     for (const it of items) {
       const qty = it.quantity || 1;
       const totalItem = it.unit_price * qty;
-      await pool.query(
-        'INSERT INTO invoice_items (invoice_id, service_id, service_name, quantity, unit_price, total) VALUES (?, ?, ?, ?, ?, ?)',
-        [invoiceId, it.serviceId, it.serviceName || null, qty, it.unit_price, totalItem]
-      );
+      const isProduct = it.productId != null;
+      if (isProduct) {
+        await pool.query(
+          'INSERT INTO invoice_items (invoice_id, service_id, service_name, product_id, product_name, quantity, unit_price, total) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?)',
+          [invoiceId, it.productId, it.productName || null, qty, it.unit_price, totalItem]
+        );
+      } else {
+        await pool.query(
+          'INSERT INTO invoice_items (invoice_id, service_id, service_name, product_id, product_name, quantity, unit_price, total) VALUES (?, ?, ?, NULL, NULL, ?, ?, ?)',
+          [invoiceId, it.serviceId, it.serviceName || null, qty, it.unit_price, totalItem]
+        );
+      }
     }
     if (appointmentId) {
       await pool.query("UPDATE appointments SET status = 'completed' WHERE id = ?", [appointmentId]);

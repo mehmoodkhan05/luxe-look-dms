@@ -50,7 +50,7 @@ router.post(
       const [result] = await pool.query(
         `INSERT INTO products (name, sku, unit, current_stock, reorder_level, supplier_name, supplier_contact)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [name, sku || null, unit || 'pcs', current_stock || 0, reorder_level ?? 5, supplier_name || null, supplier_contact || null]
+        [name, sku || null, unit || 'pcs', current_stock || 0, reorder_level ?? 0, supplier_name || null, supplier_contact || null]
       );
       res.status(201).json({ id: result.insertId, name, current_stock: current_stock || 0 });
     } catch (err) {

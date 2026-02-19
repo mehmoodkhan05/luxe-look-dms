@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Form, Modal, Badge, Spinner } from 'react-bootstrap';
 import api from '../services/api';
 import TablePagination, { paginate, useTablePagination } from '../components/TablePagination';
@@ -6,6 +7,8 @@ import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
 export default function Invoices() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [services, setServices] = useState([]);
@@ -67,6 +70,15 @@ export default function Invoices() {
     setPage(1);
     if (customers.length) load();
   }, [from, to]);
+
+  useEffect(() => {
+    const id = location.state?.viewInvoiceId;
+    if (id) {
+      setDetailPage(1);
+      api.get(`/invoices/${id}`).then((r) => setDetail(r.data));
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.viewInvoiceId]);
 
   const openNew = () => {
     setForm({
@@ -191,11 +203,16 @@ export default function Invoices() {
           <title>Invoice ${detail.invoice_number}</title>
           <style>
             @media print {
-              @page { 
-                margin: 5mm;
-                size: 80mm auto;
+              @page {
+                size: 57mm auto;
+                margin: 2mm;
               }
-              body { margin: 0; padding: 0; }
+              body {
+                margin: 0;
+                padding: 2mm;
+                max-width: 57mm;
+                width: 57mm;
+              }
             }
             * {
               margin: 0;
@@ -205,16 +222,17 @@ export default function Invoices() {
             body {
               font-family: 'Courier New', monospace;
               font-size: 11px;
+              font-weight: bold;
               line-height: 1.3;
-              padding: 10px;
-              max-width: 80mm;
+              padding: 5px;
+              max-width: 57mm;
               margin: 0 auto;
             }
             .header {
               text-align: center;
               margin-bottom: 8px;
               padding-bottom: 8px;
-              border-bottom: 1px dashed #000;
+              border-bottom: 1px solid #000;
             }
             .header h1 {
               font-size: 16px;
@@ -252,7 +270,7 @@ export default function Invoices() {
               margin-bottom: 8px;
               font-size: 10px;
               padding-bottom: 6px;
-              border-bottom: 1px dashed #000;
+              border-bottom: 1px solid #000;
             }
             .customer-info .label {
               font-weight: bold;
@@ -267,12 +285,11 @@ export default function Invoices() {
             table th {
               text-align: left;
               padding: 3px 2px;
-              border-bottom: 1px dashed #000;
+              border-bottom: 1px solid #000;
               font-weight: bold;
             }
             table td {
               padding: 2px;
-              border-bottom: 1px dotted #ccc;
             }
             table .col-item {
               width: 45%;
@@ -292,7 +309,7 @@ export default function Invoices() {
             .totals {
               margin-top: 8px;
               padding-top: 6px;
-              border-top: 1px dashed #000;
+              border-top: 1px solid #000;
               font-size: 10px;
             }
             .total-row {
@@ -311,14 +328,14 @@ export default function Invoices() {
               margin-top: 12px;
               text-align: center;
               font-size: 8px;
-              border-top: 1px dashed #000;
+              border-top: 1px solid #000;
               padding-top: 6px;
             }
             .footer p {
               margin-bottom: 3px;
             }
             .divider {
-              border-top: 1px dashed #000;
+              border-top: 1px solid #000;
               margin: 6px 0;
             }
           </style>
@@ -327,8 +344,8 @@ export default function Invoices() {
           <div class="header">
             <h1>LUXE LOOK</h1>
             <div class="subtitle">PARLOUR</div>
-            <div class="address">Spa & Beauty Salon</div>
-            <div class="phone">MOBILE: +92 XXX XXXXXXX</div>
+            <div class="address">Allah Chowk Near Comissioner House Saidu Sharif</div>
+            <div class="phone">+92 345 4545011</div>
           </div>
           
           <div class="invoice-info">
@@ -363,7 +380,7 @@ export default function Invoices() {
             </thead>
             <tbody>
               ${allItems.map(item => {
-                const itemName = (item.service_name || 'N/A').substring(0, 25);
+                const itemName = (item.service_name || item.product_name || 'N/A').substring(0, 25);
                 const qty = item.quantity || 1;
                 const price = Number(item.unit_price || 0).toFixed(2);
                 const total = Number(item.total || 0).toFixed(2);
@@ -414,7 +431,7 @@ export default function Invoices() {
           <div class="footer">
             <p>THANK YOU FOR YOUR BUSINESS!</p>
             <p>Please visit us again</p>
-            <p style="margin-top: 6px; font-size: 7px;">Generated by Luxe Look DMS</p>
+            <p style="margin-top: 6px; font-size: 7px;">Generated by Luxe Look</p>
           </div>
         </body>
       </html>
@@ -454,6 +471,7 @@ export default function Invoices() {
                   <th>Invoice #</th>
                   <th>Date</th>
                   <th>Customer</th>
+                  <th>Items</th>
                   <th>Amount</th>
                   <th>Payment</th>
                   <th></th>
@@ -465,6 +483,7 @@ export default function Invoices() {
                     <td>{inv.invoice_number}</td>
                     <td>{inv.created_at && format(new Date(inv.created_at), 'dd MMM yyyy')}</td>
                     <td>{inv.customer_name}</td>
+                    <td className="text-break" style={{ maxWidth: '200px' }} title={inv.items_summary || ''}>{inv.items_summary || '—'}</td>
                     <td>PKR {Number(inv.total_amount).toLocaleString()}</td>
                     <td><Badge bg={inv.payment_status === 'paid' ? 'success' : 'warning'}>{inv.payment_status}</Badge></td>
                     <td><Button variant="outline-primary" size="sm" onClick={() => viewDetail(inv.id)} title="View"><i className="fas fa-eye" /></Button></td>
@@ -603,7 +622,7 @@ export default function Invoices() {
               <Table size="sm">
                 <thead>
                   <tr>
-                    <th>Service</th>
+                    <th>Item</th>
                     <th>Qty</th>
                     <th className="text-end">Unit Price</th>
                     <th className="text-end">Amount</th>
@@ -612,7 +631,7 @@ export default function Invoices() {
                 <tbody>
                   {paginate(detailItems, detailPage).map((it) => (
                     <tr key={it.id}>
-                      <td>{it.service_name}</td>
+                      <td>{it.service_name || it.product_name}</td>
                       <td>{it.quantity}</td>
                       <td className="text-end">PKR {Number(it.unit_price).toLocaleString()}</td>
                       <td className="text-end">PKR {Number(it.total).toLocaleString()}</td>

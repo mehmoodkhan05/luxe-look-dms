@@ -11,7 +11,15 @@ const navItems = [
   { to: '/appointments', label: 'Appointments', icon: '📅', roles: ['admin', 'receptionist', 'staff'] },
   { to: '/services', label: 'Services', icon: '✂️', roles: ['admin', 'staff'] },
   { to: '/invoices', label: 'Invoices', icon: '🧾', roles: ['admin', 'receptionist', 'staff'] },
-  { to: '/inventory', label: 'Inventory', icon: '📦', roles: ['admin', 'staff'] },
+  {
+    label: 'Products',
+    icon: 'fa-boxes-stacked',
+    roles: ['admin', 'staff'],
+    children: [
+      { to: '/products/add', label: 'Add products', icon: '➕', roles: ['admin'] },
+      { to: '/products/sell', label: 'Sell products', icon: '🛒' },
+    ],
+  },
   {
     label: 'HR',
     icon: '🏢',
@@ -31,12 +39,13 @@ export default function Layout() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
-  const [hrOpen, setHrOpen] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState({});
   const navigate = useNavigate();
   const filteredNav = navItems.filter((item) => item.roles.includes(user?.role));
 
   useEffect(() => {
-    if (location.pathname === '/staff' || location.pathname === '/payroll') setHrOpen(true);
+    const parent = navItems.find((item) => item.children?.some((c) => c.to === location.pathname));
+    if (parent) setOpenDropdowns({ [parent.label]: true });
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -82,17 +91,17 @@ export default function Layout() {
                 <div key={item.label} className="sidebar-collapse-wrapper">
                   <button
                     type="button"
-                    className={`sidebar-collapse-trigger d-flex align-items-center gap-2 px-3 py-2 rounded-3 w-100 text-start border-0 ${hrOpen ? 'open' : ''}`}
-                    onClick={() => setHrOpen((o) => !o)}
-                    aria-expanded={hrOpen}
+                    className={`sidebar-collapse-trigger d-flex align-items-center gap-2 px-3 py-2 rounded-3 w-100 text-start border-0 ${openDropdowns[item.label] ? 'open' : ''}`}
+                    onClick={() => setOpenDropdowns((prev) => (prev[item.label] ? {} : { [item.label]: true }))}
+                    aria-expanded={!!openDropdowns[item.label]}
                   >
-                    <span className="sidebar-icon">{item.icon}</span>
+                    {item.icon?.startsWith('fa-') ? <i className={`fas ${item.icon} sidebar-icon`} aria-hidden /> : <span className="sidebar-icon">{item.icon}</span>}
                     <span>{item.label}</span>
                     <i className="fas fa-chevron-right sidebar-collapse-caret ms-auto" aria-hidden />
                   </button>
-                  <Collapse in={hrOpen}>
+                  <Collapse in={!!openDropdowns[item.label]}>
                     <div className="sidebar-collapse-content">
-                      {item.children.map((child) => (
+                      {item.children.filter((c) => !c.roles || c.roles.includes(user?.role)).map((child) => (
                         <NavLink
                           key={child.to}
                           to={child.to}
@@ -114,7 +123,7 @@ export default function Layout() {
                   end={item.to === '/'}
                   className={navLinkClass}
                 >
-                  <span className="sidebar-icon">{item.icon}</span>
+                  {item.icon?.startsWith('fa-') ? <i className={`fas ${item.icon} sidebar-icon`} aria-hidden /> : <span className="sidebar-icon">{item.icon}</span>}
                   <span>{item.label}</span>
                 </NavLink>
               )
@@ -148,17 +157,17 @@ export default function Layout() {
                   <div key={item.label} className="sidebar-collapse-wrapper">
                     <button
                       type="button"
-                      className={`sidebar-collapse-trigger d-flex align-items-center gap-2 px-3 py-2 rounded-3 w-100 text-start border-0 ${hrOpen ? 'open' : ''}`}
-                      onClick={() => setHrOpen((o) => !o)}
-                      aria-expanded={hrOpen}
+                      className={`sidebar-collapse-trigger d-flex align-items-center gap-2 px-3 py-2 rounded-3 w-100 text-start border-0 ${openDropdowns[item.label] ? 'open' : ''}`}
+                      onClick={() => setOpenDropdowns((prev) => (prev[item.label] ? {} : { [item.label]: true }))}
+                      aria-expanded={!!openDropdowns[item.label]}
                     >
-                      <span>{item.icon}</span>
+                      {item.icon?.startsWith('fa-') ? <i className={`fas ${item.icon}`} aria-hidden /> : <span>{item.icon}</span>}
                       <span>{item.label}</span>
                       <i className="fas fa-chevron-right sidebar-collapse-caret ms-auto" aria-hidden />
                     </button>
-                    <Collapse in={hrOpen}>
+                    <Collapse in={!!openDropdowns[item.label]}>
                       <div className="sidebar-collapse-content">
-                        {item.children.map((child) => (
+                        {item.children.filter((c) => !c.roles || c.roles.includes(user?.role)).map((child) => (
                           <NavLink
                             key={child.to}
                             to={child.to}
@@ -182,7 +191,7 @@ export default function Layout() {
                     className={navLinkClass}
                     onClick={() => setShowMenu(false)}
                   >
-                    <span>{item.icon}</span>
+                    {item.icon?.startsWith('fa-') ? <i className={`fas ${item.icon}`} aria-hidden /> : <span>{item.icon}</span>}
                     <span>{item.label}</span>
                   </NavLink>
                 )
